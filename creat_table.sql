@@ -22,6 +22,20 @@ CREATE TABLE Airplane (
   FOREIGN KEY (airline_name) REFERENCES Airline(name)
 );
 
+CREATE TABLE Flight (
+  airline_name VARCHAR(20) NOT NULL,
+  flight_number VARCHAR(20) NOT NULL,
+  departure_date_and_time TIMESTAMP NOT NULL,
+  arrival_date_and_time TIMESTAMP NOT NULL,
+  base_price_of_ticket NUMERIC(10,2) NOT NULL,
+  arrival_airport_code CHAR(3) NOT NULL,
+  departure_airport_code CHAR(3) NOT NULL,
+  PRIMARY KEY (flight_number,departure_date_and_time),
+  FOREIGN KEY (airline_name) REFERENCES Airline(name),
+  FOREIGN KEY (arrival_airport_code) REFERENCES Airport(code),
+  FOREIGN KEY (departure_airport_code) REFERENCES Airport(code)
+);
+
 CREATE TABLE Fly (
   airline_name VARCHAR(20) NOT NULL,
   flight_number VARCHAR(20) NOT NULL,
@@ -29,42 +43,12 @@ CREATE TABLE Fly (
   identification_number VARCHAR(6) NOT NULL,
   flight_status VARCHAR(10) NOT NULL,
   PRIMARY KEY (airline_name,flight_number,departure_date_and_time,identification_number),
-  FOREIGN KEY (airline_name) REFERENCES Airplane(name)
-  FOREIGN KEY (flight_number) REFERENCES Flight(flight_number)
-  FOREIGN KEY (departure_date_and_time) REFERENCES Flight(departure_date_and_time)
+  FOREIGN KEY (airline_name) REFERENCES Airplane(name),
+  FOREIGN KEY (flight_number) REFERENCES Flight(flight_number),
+  FOREIGN KEY (departure_date_and_time) REFERENCES Flight(departure_date_and_time),
   FOREIGN KEY (identification_number) REFERENCES Airplane(identification_number)
 );
 
-CREATE TABLE Flight (
-  airline_name VARCHAR(20) NOT NULL,
-  flight_number VARCHAR(20) NOT NULL,
-  departure_date_and_time TIMESTAMP NOT NULL,
-  arrival_date_and_time TIMESTAMP NOT NULL,
-  base_price_of_ticket NUMERIC(10,2) NOT NULL,
-  arrival_airport_code code CHAR(3) NOT NULL,
-  departure_airport_code code CHAR(3) NOT NULL,
-  PRIMARY KEY (flight_number,departure_date_and_time),
-  FOREIGN KEY (airline_name) REFERENCES Airline(name),
-  FOREIGN KEY (arrival_airport_code) REFERENCES Airport(code),
-  FOREIGN KEY (departure_airport_code) REFERENCES Airport(code)
-);
-
-CREATE TABLE Ticket (
-  ticket_ID VARCHAR(20) NOT NULL,
-  first_name VARCHAR(20) NOT NULL,
-  last_name TIMESTAMP NOT NULL,
-  date_of_birth DATE NOT NULL,
-  calculated_price_of_ticket NUMERIC(10,2) NOT NULL,
-  email_address VARCHAR(20) NOT NULL,
-  airline_name VARCHAR(20) NOT NULL,
-  flight_number VARCHAR(20) NOT NULL,
-  departure_date_and_time TIMESTAMP NOT NULL,
-  PRIMARY KEY (ticket_ID),
-  FOREIGN KEY (email_address) REFERENCES Customer(email_address),
-  FOREIGN KEY (airline_name) REFERENCES Flight(airline_name),
-  FOREIGN KEY (flight_number) REFERENCES Flight(flight_number),
-  FOREIGN KEY (departure_date_and_time) REFERENCES Flight(departure_date_and_time)
-);
 
 CREATE TABLE Payment_Information (
   card_number VARCHAR(20) NOT NULL,
@@ -99,6 +83,23 @@ CREATE TABLE Customer_Phone_Number (
   FOREIGN KEY (email_address) REFERENCES Customer(email_address) ON DELETE CASCADE
 );
 
+CREATE TABLE Ticket (
+  ticket_ID VARCHAR(20) NOT NULL,
+  first_name VARCHAR(20) NOT NULL,
+  last_name TIMESTAMP NOT NULL,
+  date_of_birth DATE NOT NULL,
+  calculated_price_of_ticket NUMERIC(10,2) NOT NULL,
+  email_address VARCHAR(20) NOT NULL,
+  airline_name VARCHAR(20) NOT NULL,
+  flight_number VARCHAR(20) NOT NULL,
+  departure_date_and_time TIMESTAMP NOT NULL,
+  PRIMARY KEY (ticket_ID),
+  FOREIGN KEY (email_address) REFERENCES Customer(email_address),
+  FOREIGN KEY (airline_name) REFERENCES Flight(airline_name),
+  FOREIGN KEY (flight_number) REFERENCES Flight(flight_number),
+  FOREIGN KEY (departure_date_and_time) REFERENCES Flight(departure_date_and_time)
+);
+
 CREATE TABLE Evaluation (
   email_address VARCHAR(20) NOT NULL,
   airline_name VARCHAR(20) NOT NULL,
@@ -110,6 +111,6 @@ CREATE TABLE Evaluation (
   FOREIGN KEY (email_address) REFERENCES Customer(email_address),
   FOREIGN KEY (airline_name) REFERENCES Flight(airline_name),
   FOREIGN KEY (flight_number) REFERENCES Flight(flight_number),
-  FOREIGN KEY (departure_date_and_time) REFERENCES Flight(departure_date_and_time),
+  FOREIGN KEY (departure_date_and_time) REFERENCES Flight(departure_date_and_time)
 );
 
