@@ -43,10 +43,9 @@ CREATE TABLE Fly (
   identification_number VARCHAR(6) NOT NULL,
   flight_status VARCHAR(10) NOT NULL,
   PRIMARY KEY (airline_name,flight_number,departure_date_and_time,identification_number),
-  FOREIGN KEY (airline_name) REFERENCES Airplane(name),
-  FOREIGN KEY (flight_number) REFERENCES Flight(flight_number),
-  FOREIGN KEY (departure_date_and_time) REFERENCES Flight(departure_date_and_time),
-  FOREIGN KEY (identification_number) REFERENCES Airplane(identification_number)
+ FOREIGN KEY (airline_name) REFERENCES Airline(name),
+  FOREIGN KEY (flight_number,departure_date_and_time) REFERENCES Flight(flight_number,departure_date_and_time),
+  FOREIGN KEY (identification_number,airline_name) REFERENCES Airplane(identification_number,airline_name)
 );
 
 
