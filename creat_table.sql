@@ -1,6 +1,6 @@
 CREATE TABLE Airport (
   code CHAR(3),
-  name VARCHAR(20) NOT NULL,
+  name VARCHAR(200) NOT NULL,
   city VARCHAR(20) NOT NULL,
   country VARCHAR(20) NOT NULL,
   airport_type VARCHAR(20) NOT NULL,
@@ -87,10 +87,10 @@ CREATE TABLE Ticket (
   last_name VARCHAR(20) NOT NULL,
   date_of_birth DATE NOT NULL,
   calculated_price_of_ticket NUMERIC(10,2) NOT NULL,
-  email_address VARCHAR(50) NOT NULL,
   airline_name VARCHAR(20) NOT NULL,
   flight_number VARCHAR(20) NOT NULL,
   departure_date_and_time TIMESTAMP NOT NULL,
+  email_address VARCHAR(50) NOT NULL,
   PRIMARY KEY (ticket_ID),
   FOREIGN KEY (email_address) REFERENCES Customer(email_address),
   FOREIGN KEY (airline_name, flight_number, departure_date_and_time) REFERENCES Flight(airline_name, flight_number, departure_date_and_time)
