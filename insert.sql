@@ -26,7 +26,7 @@ INSERT INTO Fly VALUES ('Jet Blue', 'JB23040602', '2023-04-06 11:30:00', 'N345JB
 
 INSERT INTO Payment_Information VALUES ('1234123412341234', 'debit', 'Yuwei Sun', DATE('2028-05-01'));
 INSERT INTO Payment_Information VALUES ('5678567856785678', 'credit', 'Yirong Wang', DATE('2028-06-01'));
-INSERT INTO Ticket  VALUES ('123', 'Yuwei', 'Sun', DATE('2002-12-26'), 200.00, 'Jet Blue', 'JB23040601', '2023-04-06 10:30:00', 'ys4680@nyu.edu');
-INSERT INTO Ticket  VALUES ('567', 'Yirong','Wang',DATE('2003-03-25'), 210.00, 'Jet Blue', 'JB23040601', '2023-04-06 10:30:00', 'yw5490@nyu.edu');
+INSERT INTO Ticket VALUES ('123', 'Yuwei', 'Sun', DATE('2002-12-26'), 200.00, 'Jet Blue', 'JB23040601', '2023-04-06 10:30:00', 'ys4680@nyu.edu');
+INSERT INTO Ticket VALUES ('567', 'Yirong', 'Wang', DATE('2003-03-25'), 210.00, 'Jet Blue', 'JB23040601', '2023-04-06 10:30:00', 'yw5490@nyu.edu');
 INSERT INTO Purchase VALUES ('123', '1234123412341234', '2023-04-06 09:30:00');
 INSERT INTO Purchase VALUES ('567', '5678567856785678', '2023-04-06 09:30:00');
