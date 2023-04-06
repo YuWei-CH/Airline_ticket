@@ -21,7 +21,7 @@ Result:
 
 
 -- 3. Show the customer names who bought the tickets.
-SELECT DISTINCT Customer.first_name, Customer.last_name
+SELECT Customer.first_name, Customer.last_name
 FROM Customer NATURAL JOIN Ticket
 
 /*
