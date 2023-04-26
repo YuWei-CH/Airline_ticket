@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Ticket Resrvation System</title>
+    <link rel="stylesheet" href="../CSS/user-main.css" />
+  </head>
+  <body>
+    <header>
+      <!-- Welcome, {name}-->
+      <h1>Ticket Resrvation System</h1>
+      <nav>
+        <ul>
+          <li><a href="#">Search Ticket</a></li>
+          <li><a href="#">My Ticket</a></li>
+          <li><a href="#">Track Spend</a></li>
+          <li><a href="#">Log Out</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <h1>View My Flights</h1>
+    <form>
+      <label for="date-range">Filter by date range:</label>
+      <input type="date" id="start-date" name="start-date" />
+      <input type="date" id="end-date" name="end-date" />
+      <button type="submit">Filter</button>
+    </form>
+    <form>
+      <label for="destination">Filter by destination:</label>
+      <input type="text" id="destination" name="destination" />
+      <button type="submit">Filter</button>
+    </form>
+    <form>
+      <label for="source-airport">Filter by source airport:</label>
+      <input type="text" id="source-airport" name="source-airport" />
+      <button type="submit">Filter</button>
+    </form>
+    <form>
+      <label for="city-name">Filter by city name:</label>
+      <input type="text" id="city-name" name="city-name" />
+      <button type="submit">Filter</button>
+    </form>
+    <table>
+      <thead>
+        <tr>
+          <th>Flight Number</th>
+          <th>Departure Date</th>
+          <th>Arrival Date</th>
+          <th>Departure Airport</th>
+          <th>Arrival Airport</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- flight data will be populated here dynamically -->
+      </tbody>
+    </table>
+  </body>
+    </main>
+  </body>
+</html>
