@@ -1,4 +1,4 @@
-/* style.css */
+/*
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -41,7 +41,11 @@ label {
   display: block;
 }
 
-/* style for Track my flight*/
+
+h1 {
+  text-align: center;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -55,4 +59,9 @@ td {
 
 th {
   background-color: lightgray;
+}
+*/
+
+table, th, td {
+  border: 1px solid black;
 }

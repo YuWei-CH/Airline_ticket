@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ticket Resrvation System</title>
+    <link rel="stylesheet" href="../CSS/user-track.css" />
+  </head>
+  <body>
+    <main>
+      <h1>View My Ticket</h1>
+      <!-- navigate bar -->
+      <nav>
+        <ul>
+          <li><a href="user-main.html">Back to Main</a></li>
+          <li><a href="#">Log Out</a></li>
+        </ul>
+      </nav>
+
+      <!--Track my ticket -->
+      <div>
+        <h1 id="track-flight-heading">Track Flights</h1>
+        <form>
+          <label for="date-range">Filter by date range:</label>
+          <input type="date" id="start-date" name="start-date" />
+          <input type="date" id="end-date" name="end-date" />
+          <button type="submit">Filter</button>
+        </form>
+        <form>
+          <label for="destination">Filter by destination:</label>
+          <input type="text" id="destination" name="destination" />
+          <button type="submit">Filter</button>
+        </form>
+        <form>
+          <label for="source-airport">Filter by source airport:</label>
+          <input type="text" id="source-airport" name="source-airport" />
+          <button type="submit">Filter</button>
+        </form>
+        <form>
+          <label for="city-name">Filter by city name:</label>
+          <input type="text" id="city-name" name="city-name" />
+          <button type="submit">Filter</button>
+        </form>
+        <table>
+          <thead>
+            <tr>
+              <th>Flight Number</th>
+              <th>Departure Date</th>
+              <th>Arrival Date</th>
+              <th>Departure Airport</th>
+              <th>Arrival Airport</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!--test data -->
+            <tr>
+              <td>CA123</td>
+              <td>2023-05-01</td>
+              <td>2023-05-01</td>
+              <td>PEK</td>
+              <td>JFK</td>
+            </tr>
+            <!--flask template-->
+            <!-- flight data will be populated here dynamically -->
+            {% for flight in flights %}
+            <tr>
+              <td>{{ flight.flight_number }}</td>
+              <td>{{ flight.departure_date }}</td>
+              <td>{{ flight.arrival_date }}</td>
+              <td>{{ flight.departure_airport }}</td>
+              <td>{{ flight.arrival_airport }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </body>
+</html>
