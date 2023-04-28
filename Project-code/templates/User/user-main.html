@@ -11,7 +11,7 @@
     <!--Header-->
     <header>
       <!-- Welcome, {name}-->
-      <h1>Welcome,{name}</h1>
+      <h1>Welcome, {{username.first_name}}</h1>
       <!-- navigator bar -->
       <nav>
         <ul>
@@ -30,30 +30,24 @@
           <thead>
             <tr>
               <th>Flight Number</th>
-              <th>Departure Date</th>
-              <th>Arrival Date</th>
+              <th>Departure Date and Time</th>
+              <th>Arrival Date and Time</th>
+              <th>Price</th>
               <th>Departure Airport</th>
               <th>Arrival Airport</th>
             </tr>
           </thead>
           <tbody>
             <!-- flight data will be populated here dynamically -->
-            <!--test data -->
-            <tr>
-              <td>CA123</td>
-              <td>2023-05-01</td>
-              <td>2023-05-01</td>
-              <td>PEK</td>
-              <td>JFK</td>
-            </tr>
             <!--flask template-->
             {% for flight in flights %}
             <tr>
               <td>{{ flight.flight_number }}</td>
-              <td>{{ flight.departure_date }}</td>
-              <td>{{ flight.arrival_date }}</td>
-              <td>{{ flight.departure_airport }}</td>
-              <td>{{ flight.arrival_airport }}</td>
+              <td>{{ flight.departure_date_and_time }}</td>
+              <td>{{ flight.arrival_date_and_time }}</td>
+              <td>{{ flight.calculated_price_of_ticket }}</td>
+              <td>{{ flight.arrival_airport_code }}</td>
+              <td>{{ flight.departure_airport_code }}</td>
             </tr>
             {% endfor %}
           </tbody>

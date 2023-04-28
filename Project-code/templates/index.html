@@ -4,28 +4,75 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="CSS/index.css" />
     <title>Ticket Resrvation System</title>
   </head>
   <body>
     <h1>Flight Search</h1>
     <br />
-    <a href="/login">Login</a> | <a href="/register">Register</a>
+    <a href="User/user-login.html">User Login</a> |
+    <a href="User/user-register.html">User Register</a>
+    <br />
+    <a href="#">Staff Login</a> | <a href="#">Staff Register</a>
     <br />
     <br />
     <form action="{{ url_for('search_flights') }}" method="post">
-      <label for="source">Source City/Airport:</label>
-      <input type="text" id="source" name="source" /><br /><br />
-      <label for="destination">Destination City/Airport:</label>
-      <input type="text" id="destination" name="destination" /><br /><br />
-      <label for="departure">Departure Date:</label>
-      <input type="date" id="departure" name="departure" /><br /><br />
-      <label for="return">Return Date:</label>
-      <input type="date" id="return" name="return" /><br /><br />
+      <label for="airline_name">Airline Name:</label>
+      <input type="text" id="airline_name" name="airline_name" /><br /><br />
+      <label for="flight_number">Flight Number:</label>
+      <input type="text" id="flight_number" name="flight_number" /><br /><br />
+      <label for="departure_date_and_time">Departure Date:</label>
+      <input
+        type="datetime-local"
+        id="departure_date_and_time"
+        name="departure_date_and_time"
+      /><br /><br />
+      <label for="arrival_date_and_time">Arrival Date:</label>
+      <input
+        type="datetime-local"
+        id="arrival_date_and_time"
+        name="arrival_date_and_time"
+      /><br /><br />
+      <label for="arrival_airport_code">Arrival Airport Code:</label>
+      <input
+        type="text"
+        id="arrival_airport_code"
+        name="arrival_airport_code"
+      /><br /><br />
+      <label for="departure_airport_code">Departure Airport Code:</label>
+      <input
+        type="text"
+        id="departure_airport_code"
+        name="departure_airport_code"
+      /><br /><br />
+      <!--submit and reset-->
       <input type="submit" value="Search" />
+      <input type="reset" value="Clear" />
     </form>
-    <br />
-    {% for flight in flights %}
-    <p>{{ flight }}</p>
-    {% endfor %}
+    {% if error %}
+    <p class="error"><strong>Error:</strong> {{error}}</p>
+    {% endif %}
+    <table>
+      <tr>
+        <th>Airline Name</th>
+        <th>Flight Number</th>
+        <th>Departure Date and Time</th>
+        <th>Arrival Date and Time</th>
+        <th>Base Price of Ticket</th>
+        <th>Arrival Airport Code</th>
+        <th>Departure Airport Code</th>
+      </tr>
+      {% for flight in flights %}
+      <tr>
+        <td>{{ flight.airline_name }}</td>
+        <td>{{ flight.flight_number }}</td>
+        <td>{{ flight.departure_date_and_time }}</td>
+        <td>{{ flight.arrival_date_and_time }}</td>
+        <td>{{ flight.base_price_of_ticket }}</td>
+        <td>{{ flight.arrival_airport_code }}</td>
+        <td>{{ flight.departure_airport_code }}</td>
+      </tr>
+      {% endfor %}
+    </table>
   </body>
 </html>

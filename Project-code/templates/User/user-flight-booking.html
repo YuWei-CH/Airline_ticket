@@ -21,7 +21,7 @@
     <!-- search bar -->
     <!---->
     <div class="search-bar">
-      <form>
+      <form action="{{ url_for('search_flights') }}" method="POST">
         <!--when user click label, the input will be focused-->
         <label for="source-city">Source City:</label>
         <!--name will mark the input for back-end -->

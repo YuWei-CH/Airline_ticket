@@ -1,7 +1,13 @@
 <html>
-  <head> </head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ticket Resrvation System</title>
+  </head>
   <body>
-    <form action="process_form.php" method="post">
+    <h1>Please fill your personal date here</h1>
+    <form action="/registerAuth" method="POST">
       <label for="first_name">First Name:</label>
       <input type="text" id="first_name" name="first_name" required /><br />
 
@@ -37,8 +43,16 @@
       <label for="zip_code">Zip Code:</label>
       <input type="text" id="zip_code" name="zip_code" required /><br />
 
-      <label for="phone_number">Phone Number:</label>
-      <input type="tel" id="phone_number" name="phone_number" required /><br />
+      <label for="phone_number1">Phone Number1:</label>
+      <input
+        type="tel"
+        id="phone_number1"
+        name="phone_number1"
+        required
+      /><br />
+
+      <label for="phone_number2">Phone Number2:</label>
+      <input type="tel" id="phone_number2" name="phone_number2" /><br />
 
       <label for="passport_number">Passport Number:</label>
       <input
