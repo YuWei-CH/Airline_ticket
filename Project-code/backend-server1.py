@@ -14,9 +14,8 @@ conn = pymysql.connect(host='localhost',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
 
+
 # Define a route to hello function
-
-
 @app.route('/')
 def hello():
     return render_template('index.html')
@@ -69,6 +68,16 @@ def loginAuth():
 
 @app.route('/registerAuth', methods=['GET', 'POST'])
 def registerAuth():
+    # 获取 HTML 表单提交的数据
+    name = request.form['name']
+    email = request.form['email']
+    password = request.form['password']
+    address = request.form['address']
+    phone_number = request.form['phone_number']
+    passport_number = request.form['passport_number']
+    passport_expiration = request.form['passport_expiration']
+    passport_country = request.form['passport_country']
+    date_of_birth = request.form['date_of_birth']
     # grabs information from the forms
     username = request.form['username']
     password = request.form['password']
@@ -94,7 +103,15 @@ def registerAuth():
         return render_template('index.html')
 
 
-@app.route('/user-main.html', methods=['GET', 'POST'])
+'''
+@app.route('/logout')
+def logout():
+    session.pop('username')
+    return redirect('/')
+'''
+
+
+@app.route('/User/user-main.html', methods=['GET', 'POST'])
 def get_future_ticket():
     # temp data
     flights = [
@@ -105,13 +122,21 @@ def get_future_ticket():
         {'flight_number': 'CZ789', 'departure_date': '2023-05-02',
          'arrival_date': '2023-05-02', 'departure_airport': 'CAN', 'arrival_airport': 'SFO'}
     ]
-    return render_template('user-main.html', flights=flights)
+    return render_template('User/user-main.html', flights=flights)
 
 
-@app.route('/logout')
-def logout():
-    session.pop('username')
-    return redirect('/')
+@app.route('/User/user-flight-booking.html', methods=['GET', 'POST'])
+def get_user_ticket():
+    # temp data
+    flights = [
+        {'flight_number': 'CA123', 'departure_date': '2023-05-01',
+         'arrival_date': '2023-05-01', 'departure_airport': 'PEK', 'arrival_airport': 'JFK'},
+        {'flight_number': 'MU456', 'departure_date': '2023-05-01',
+         'arrival_date': '2023-05-01', 'departure_airport': 'SHA', 'arrival_airport': 'LAX'},
+        {'flight_number': 'CZ789', 'departure_date': '2023-05-02',
+         'arrival_date': '2023-05-02', 'departure_airport': 'CAN', 'arrival_airport': 'SFO'}
+    ]
+    return render_template('User/user-flight-booking.html', flights=flights)
 
 
 app.secret_key = 'some key that you will never guess'

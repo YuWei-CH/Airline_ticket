@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ticket Resrvation System</title>
+  </head>
+  <body>
+    <h1>Flight Search</h1>
+    <br />
+    <a href="/login">Login</a> | <a href="/register">Register</a>
+    <br />
+    <br />
+    <form action="{{ url_for('search_flights') }}" method="post">
+      <label for="source">Source City/Airport:</label>
+      <input type="text" id="source" name="source" /><br /><br />
+      <label for="destination">Destination City/Airport:</label>
+      <input type="text" id="destination" name="destination" /><br /><br />
+      <label for="departure">Departure Date:</label>
+      <input type="date" id="departure" name="departure" /><br /><br />
+      <label for="return">Return Date:</label>
+      <input type="date" id="return" name="return" /><br /><br />
+      <input type="submit" value="Search" />
+    </form>
+    <br />
+    {% for flight in flights %}
+    <p>{{ flight }}</p>
+    {% endfor %}
+  </body>
+</html>
