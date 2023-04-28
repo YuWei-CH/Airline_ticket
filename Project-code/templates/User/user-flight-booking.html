@@ -50,7 +50,7 @@
         <label for="return-date">Return Date:</label>
         <input type="date" id="return-date" name="return-date" /><br />
 
-        <button type="submit">Search</button>
+        <input type="submit" value="Search" />
       </form>
     </div>
 
@@ -71,13 +71,15 @@
         </tr>
       </thead>
       <tbody>
+        {% for flight in flights %}
         <tr>
-          <td>{{ flight_number }}</td>
-          <td>{{ departure_date }}</td>
-          <td>{{ arrival_date }}</td>
-          <td>{{ departure_airport }}</td>
-          <td>{{ arrival_airport }}</td>
+          <td>{{ flight.flight_number }}</td>
+          <td>{{ flight.departure_date }}</td>
+          <td>{{ flight.arrival_date }}</td>
+          <td>{{ flight.departure_airport }}</td>
+          <td>{{ flight.arrival_airport }}</td>
         </tr>
+        {% endfor %}
       </tbody>
     </table>
   </body>
