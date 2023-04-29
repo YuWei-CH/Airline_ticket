@@ -27,7 +27,17 @@
       }
 
       nav a {
-        margin-right: 3rem;
+        margin-right: 2rem;
+      }
+
+      table {
+        width: 100%;
+        border: 1px solid black;
+      }
+
+      th,
+      td {
+        border: 1px solid black;
       }
     </style>
   </head>
@@ -40,6 +50,7 @@
     <nav>
       <ul>
         <a class="actions" href="view-flights.html">View Flight</a>
+        <a class="actions" href="view-customers.html">View Customers</a>
         <a class="actions" href="new-flight.html">Create New Flight</a>
         <a class="actions" href="change-status.html">Change Flight Status</a>
         <a class="actions" href="add-airplane.html">Add Airplane</a>
@@ -54,5 +65,16 @@
     </nav>
 
     <h2>Future Flight for Next 30 Days</h2>
+    <table>
+      <tr>
+        <th>Flight Number</th>
+        <th>Departure Date and Time</th>
+        <th>Arrival Date and Time</th>
+        <th>Departure Airport</th>
+        <th>Arrival Airport</th>
+        <th>Base Price of Ticket</th>
+      </tr>
+      <tr></tr>
+    </table>
   </body>
 </html>

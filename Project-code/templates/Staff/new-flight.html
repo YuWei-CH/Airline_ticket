@@ -6,5 +6,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Create New Flight</title>
   </head>
-  <body></body>
+  <body>
+    <h1>Create New Flight</h1>
+    <form action="/newFlight" method="POST">
+      <label for="flight-number">Flight Number: </label>
+      <input type="text" name="flight-number" id="flight-number" required />
+      <br /><br />
+      <label for="departure-date-and-time">Departure Date and Time: </label>
+      <input
+        type="datetime-local"
+        name="departure-date-and-time"
+        id="departure-date-and-time"
+        required
+      />
+      <br /><br />
+      <label for="arrival-date-and-time">Arrival Date and Time: </label>
+      <input
+        type="datetime-local"
+        name="arrival-date-and-time"
+        id="arrival-date-and-time"
+        required
+      />
+      <br /><br />
+      <label for="base-price">Base Price of Ticket: </label>
+      <input type="number" name="base-price" id="base-price" required />
+      <br /><br />
+      <label for="departure-airport">Departure Airport Code: </label>
+      <input type="text" name="departure-airport" id="departure-airport" />
+      <br /><br />
+      <label for="arrival-airport">Arrival Airport Code: </label>
+      <input type="text" name="arrival-airport" id="arrival-airport" />
+      <br /><br />
+      <input type="submit" value="Create" />
+      <br /><br />
+    </form>
+  </body>
 </html>

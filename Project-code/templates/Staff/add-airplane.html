@@ -5,6 +5,80 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Add Airplane</title>
+    <style>
+      #home {
+        position: fixed;
+        top: 25px;
+        right: 25px;
+        color: black;
+        text-decoration: none;
+      }
+
+      #home:hover {
+        text-decoration: underline;
+      }
+
+      table {
+        width: 100%;
+        border: 1px solid black;
+      }
+
+      th,
+      td {
+        border: 1px solid black;
+      }
+    </style>
   </head>
-  <body></body>
+  <body>
+    <div>
+      <h1>Add Airplane</h1>
+      <a id="home" href="staff-main.html">Home</a>
+    </div>
+
+    <form action="/addAirplane" method="POST">
+      <label for="identification-number">Identification Number: </label>
+      <input
+        type="text"
+        name="identification-number"
+        id="identification-number"
+        required
+      />
+      <br /><br />
+      <label for="number-of-seats">Number of Seats: </label>
+      <input
+        type="number"
+        name="number-of-seats"
+        id="number-of-seats"
+        required
+      />
+      <br /><br />
+      <label for="manufacturing-company">Manufacturing Company: </label>
+      <input
+        type="text"
+        name="manufacturing-company"
+        id="manufacturing-company"
+        required
+      />
+      <br /><br />
+      <label for="manufacture-date">Manufacture Date: </label>
+      <input
+        type="date"
+        name="manufacture-date"
+        id="manufacture-date"
+        required
+      />
+      <br /><br />
+      <input type="submit" value="Add" />
+    </form>
+    <h2>All Airplanes Owned By XXX</h2>
+    <table>
+      <tr>
+        <th>Identification Number</th>
+        <th>Number of Seats</th>
+        <th>Manufacturing Company</th>
+        <th>Manufacture Date</th>
+      </tr>
+      <tr></tr>
+    </table>
+  </body>
 </html>

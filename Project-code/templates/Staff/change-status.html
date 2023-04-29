@@ -6,5 +6,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Change Flight Status</title>
   </head>
-  <body></body>
+  <body>
+    <h1>Change Status of Flights</h1>
+    <form action="/changeStatus" method="POST">
+      <label for="flight-number">Flight Number: </label>
+      <input type="text" name="flight-number" id="flight-number" required />
+      <br /><br />
+      <label for="departure-date-and-time">Departure Date and Time: </label>
+      <input
+        type="datetime-local"
+        name="departure-date-and-time"
+        id="departure-date-and-time"
+        required
+      />
+      <br /><br />
+      <label for="status">Status: </label>
+      <select name="status" id="status" required>
+        <option value="" disabled selected hidden>Status</option>
+        <option value="On Time">On Time</option>
+        <option value="Delayed">Delayed</option>
+      </select>
+      <br /><br />
+      <input type="submit" value="Update" />
+      <br /><br />
+    </form>
+  </body>
 </html>

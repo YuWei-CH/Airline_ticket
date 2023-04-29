@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>View Flight</title>
+    <title>View Customers</title>
     <style>
       table {
         width: 100%;
@@ -31,34 +31,33 @@
   </head>
   <body>
     <div>
-      <h1>View Flight</h1>
+      <h1>View Customers</h1>
       <a id="home" href="staff-main.html">Home</a>
     </div>
 
-    <form action="/viewFlights" method="POST">
-      <label for="from-date">From Date</label>
-      <input type="date" name="from-date" id="from-date" />
+    <form action="/viewCustomers" method="POST">
+      <label for="flight-number">Flight Number: </label>
+      <input type="text" name="flight-number" id="flight-number" required />
       <br /><br />
-      <label for="to-date">To Date</label>
-      <input type="date" name="to-date" id="to-date" />
-      <br /><br />
-      <label for="source-airport">Source Airport: </label>
-      <input type="text" name="source-airport" id="source-airport" />
-      <br /><br />
-      <label for="destination-airport">Destination Airport: </label>
-      <input type="text" name="destination-airport" id="destination-airport" />
+      <label for="departure-date-and-time">Departure Date and Time: </label>
+      <input
+        type="datetime-local"
+        name="departure-date-and-time"
+        id="departure-date-and-time"
+        required
+      />
       <br /><br />
       <input type="submit" value="Search" />
       <br /><br />
     </form>
     <table>
       <tr>
-        <th>Flight Number</th>
-        <th>Departure Date and Time</th>
-        <th>Arrival Date and Time</th>
-        <th>Departure Airport</th>
-        <th>Arrival Airport</th>
-        <th>Base Price of Ticket</th>
+        <th>Email Address</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Date of Birth</th>
+        <th>Passport Number</th>
+        <th>Phone Number</th>
       </tr>
       <tr></tr>
     </table>

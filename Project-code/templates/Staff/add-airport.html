@@ -6,5 +6,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Add Airport</title>
   </head>
-  <body></body>
+  <body>
+    <h1>Add Airport</h1>
+    <form action="/addAirport" method="POST">
+      <label for="code">Airport Code: </label>
+      <input type="text" name="code" id="code" required />
+      <br /><br />
+      <label for="name">Airport Name: </label>
+      <input type="text" name="name" id="name" required />
+      <br /><br />
+      <label for="city">Airport City: </label>
+      <input type="text" name="city" id="city" required />
+      <br /><br />
+      <label for="country">Airport Country: </label>
+      <input type="text" name="country" id="country" required />
+      <br /><br />
+      <label for="type">Airport Type: </label>
+      <select name="type" id="type" required>
+        <option value="" disabled selected hidden>Type</option>
+        <option value="Domestic">Domestic</option>
+        <option value="International">International</option>
+        <option value="Both">Both</option>
+      </select>
+      <br /><br />
+      <input type="submit" value="Add" />
+      <br /><br />
+    </form>
+  </body>
 </html>
