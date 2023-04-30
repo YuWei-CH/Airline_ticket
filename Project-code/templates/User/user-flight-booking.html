@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Flight Booking</title>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,44 +12,50 @@
     <!-- navigate bar -->
     <nav>
       <ul>
-        <li><a href="user-main.html">Back to Main</a></li>
-        <li><a href="#">Log Out</a></li>
+        <li><a href="/user-main">Back to Main</a></li>
+        <li><a href="/logout">Log Out</a></li>
       </ul>
     </nav>
 
     <!-- search bar -->
     <!---->
     <div class="search-bar">
-      <form action="{{ url_for('search_flights') }}" method="POST">
-        <!--when user click label, the input will be focused-->
-        <label for="source-city">Source City:</label>
-        <!--name will mark the input for back-end -->
-        <input type="text" id="source-city" name="source-city" /><br />
-
-        <label for="source-airport">Source Airport:</label>
-        <input type="text" id="source-airport" name="source-airport" /><br />
-
-        <label for="destination-city">Destination City:</label>
+      <form action="{{ url_for('search_and_book_flight') }}" method="POST">
+        <label for="airline_name">Airline Name:</label>
+        <input type="text" id="airline_name" name="airline_name" /><br /><br />
+        <label for="flight_number">Flight Number:</label>
         <input
           type="text"
-          id="destination-city"
-          name="destination-city"
-        /><br />
-
-        <label for="destination-airport">Destination Airport:</label>
+          id="flight_number"
+          name="flight_number"
+        /><br /><br />
+        <label for="departure_date_and_time">Departure Date:</label>
+        <input
+          type="datetime-local"
+          id="departure_date_and_time"
+          name="departure_date_and_time"
+        /><br /><br />
+        <label for="arrival_date_and_time">Arrival Date:</label>
+        <input
+          type="datetime-local"
+          id="arrival_date_and_time"
+          name="arrival_date_and_time"
+        /><br /><br />
+        <label for="arrival_airport_code">Arrival Airport Code:</label>
         <input
           type="text"
-          id="destination-airport"
-          name="destination-airport"
-        /><br />
-
-        <label for="departure-date">Departure Date:</label>
-        <input type="date" id="departure-date" name="departure-date" /><br />
-
-        <label for="return-date">Return Date:</label>
-        <input type="date" id="return-date" name="return-date" /><br />
-
+          id="arrival_airport_code"
+          name="arrival_airport_code"
+        /><br /><br />
+        <label for="departure_airport_code">Departure Airport Code:</label>
+        <input
+          type="text"
+          id="departure_airport_code"
+          name="departure_airport_code"
+        /><br /><br />
+        <!--submit and reset-->
         <input type="submit" value="Search" />
+        <input type="reset" value="Clear" />
       </form>
     </div>
 
@@ -68,16 +73,25 @@
           <th>Arrival Date</th>
           <th>Departure Airport</th>
           <th>Arrival Airport</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         {% for flight in flights %}
         <tr>
           <td>{{ flight.flight_number }}</td>
-          <td>{{ flight.departure_date }}</td>
-          <td>{{ flight.arrival_date }}</td>
-          <td>{{ flight.departure_airport }}</td>
-          <td>{{ flight.arrival_airport }}</td>
+          <td>{{ flight.departure_date_and_time }}</td>
+          <td>{{ flight.arrival_date_and_time }}</td>
+          <td>{{ flight.departure_airport_code }}</td>
+          <td>{{ flight.arrival_airport_code }}</td>
+          <td>
+            <form
+              method="POST"
+              action="{{ url_for('purchase_form', flight_number=flight.flight_number) }}"
+            >
+              <input type="submit" value="Purchase" />
+            </form>
+          </td>
         </tr>
         {% endfor %}
       </tbody>

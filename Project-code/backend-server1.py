@@ -1,7 +1,7 @@
 # Import Flask Library
 from flask import Flask, render_template, request, session, url_for, redirect
 import pymysql.cursors
-from datetime import datetime
+
 
 # Initialize the app from Flask
 app = Flask(__name__)
@@ -21,6 +21,16 @@ conn = pymysql.connect(host='localhost',
 def hello():
     return render_template('index.html')
 
+# Define logout
+
+
+@app.route('/logout')
+def logout():
+    session.pop('username')
+    session.pop('email')
+    return redirect('/')
+
+
 # Define route for login
 
 
@@ -34,6 +44,13 @@ def login():
 @app.route('/User/user-register.html')
 def register():
     return render_template('User/user-register.html')
+
+# search and book for specific flight by user
+
+
+@app.route('/User/user-flight-booking.html')
+def booking():
+    return render_template('User/user-flight-booking.html')
 
 # query future flight
 
@@ -94,13 +111,13 @@ def loginAuth():
     if (data):
         # creates a session for the the user
         # session is a built in
-        session['name'] = name
+        session['username'] = name
         session['email'] = email
         return redirect(url_for('user_main'))
     else:
         # returns an error message to the html page
         error = 'Invalid login or email'
-        return render_template('login.html', error=error)
+        return render_template('User/user-login.html', error=error)
 
 
 # Authenticates the register
@@ -137,7 +154,7 @@ def registerAuth():
     if (data):
         # If the previous query returns data, then user exists
         error = "This user already exists"
-        return render_template('register.html', error=error)
+        return render_template('User/user-register.html', error=error)
     else:
         ins = "INSERT INTO Customer (email_address,first_name, last_name, c_password, building_number, street_name, apartment_number, city, state, zip_code, phone_number1, phone_number2, passport_number, passport_expiration, passport_country, date_of_birth) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s)"
         cursor.execute(ins, (email, first_name, last_name, password, building_number, street_name, apartment_number, city,
@@ -147,40 +164,228 @@ def registerAuth():
         return render_template('index.html')
 
 
-'''
-@app.route('/logout')
-def logout():
-    session.pop('username')
-    return redirect('/')
-'''
-
-
 @app.route('/user-main', methods=['GET', 'POST'])
 def user_main():
-    username = session['name']
+    username = session['username']
     email = session['email']
     # cursor used to send queries
     cursor = conn.cursor()
     # executes query
-    query = 'SELECT * FROM Ticket JOIN Flight WHERE email_address = %s AND Ticket.flight_number = Flight.flight_number'
+    query = "SELECT * FROM (SELECT f.airline_name, f.departure_date_and_time, f.arrival_date_and_time, f.arrival_airport_code, f.departure_airport_code, f.flight_number FROM Ticket t JOIN Flight f ON f.flight_number=t.flight_number WHERE email_address= %s) AS derived_table_alias WHERE (derived_table_alias.departure_date_and_time > NOW()  AND derived_table_alias.arrival_date_and_time > NOW());"
     cursor.execute(query, (email))
     # stores the results in a variable
     flights = cursor.fetchall()
     return render_template('User/user-main.html', username=username, flights=flights)
 
 
-@app.route('/user-flight-booking.html', methods=['GET', 'POST'])
-def get_user_ticket():
-    # temp data
-    flights = [
-        {'flight_number': 'CA123', 'departure_date': '2023-05-01',
-         'arrival_date': '2023-05-01', 'departure_airport': 'PEK', 'arrival_airport': 'JFK'},
-        {'flight_number': 'MU456', 'departure_date': '2023-05-01',
-         'arrival_date': '2023-05-01', 'departure_airport': 'SHA', 'arrival_airport': 'LAX'},
-        {'flight_number': 'CZ789', 'departure_date': '2023-05-02',
-         'arrival_date': '2023-05-02', 'departure_airport': 'CAN', 'arrival_airport': 'SFO'}
-    ]
+@app.route('/purchase-form/<flight_number>', methods=['GET', 'POST'])
+def purchase_form(flight_number):
+    return render_template('User/user-payment.html', flight_number=flight_number)
+
+
+@app.route('/purchase_result')
+def purchase_result():
+    return render_template('User/user-purchase-result.html')
+
+# For purchase-form, I have to ignore CSS 404. If not, it will jump to error
+
+
+@app.route('/CSS/<path:path>')
+def serve_css(path):
+    """Serve CSS files"""
+    return "", 404 if not path.endswith('.css') else 200
+
+
+@app.route('/user-track', methods=['GET', 'POST'])
+def user_track():
+    email = session['email']
+    # cursor used to send queries
+    cursor = conn.cursor()
+    # executes query
+    query = "SELECT * FROM (SELECT f.airline_name, f.departure_date_and_time, f.arrival_date_and_time, f.arrival_airport_code, f.departure_airport_code, f.flight_number FROM Ticket t JOIN Flight f ON f.flight_number=t.flight_number WHERE email_address= %s) AS derived_table_alias WHERE arrival_date_and_time < NOW();"
+    cursor.execute(query, (email))
+    # stores the results in a variable
+    flights = cursor.fetchall()
+    return render_template('User/user-track.html', flights=flights)
+
+
+@app.route('/rate-result', methods=['GET', 'POST'])
+def rate_result():
+    return render_template('User/user-rate-result.html')
+
+
+"""
+#########################
+"""
+
+# user-main future search
+
+
+@app.route('/search_user_flights', methods=['POST'])
+def search_user_flights():
+    email = session['email']
+    username = session['username']
+    # get data from form
+    flight_number = request.form['flight_number']
+    departure_date_and_time = request.form['departure_date_and_time']
+    arrival_date_and_time = request.form['arrival_date_and_time']
+    arrival_airport_code = request.form['arrival_airport_code']
+    departure_airport_code = request.form['departure_airport_code']
+
+    # cursor used to send queries
+    cursor = conn.cursor()
+    # executes query
+    # executes query
+    query = "SELECT * FROM (SELECT f.airline_name, f.departure_date_and_time, f.arrival_date_and_time, f.arrival_airport_code, f.departure_airport_code, f.flight_number FROM Ticket t JOIN Flight f ON f.flight_number = t.flight_number WHERE email_address = %s) AS derived_table_alias WHERE derived_table_alias.flight_number = %s OR derived_table_alias.departure_date_and_time = %s OR derived_table_alias.arrival_date_and_time = %s OR derived_table_alias.arrival_airport_code = %s OR derived_table_alias.departure_airport_code = %s"
+    cursor.execute(query, (email, flight_number, departure_date_and_time,
+                   arrival_date_and_time, arrival_airport_code, departure_airport_code))
+    # stores the results in a variable
+    flights = cursor.fetchall()
+    # use fetchall() if you are expecting more than 1 data row
+    cursor.close()
+    if len(flights) == 0:
+        # no flights
+        error = 'No flights found for the selected criteria.'
+        return render_template('User/user-main.html', error=error, username=username)
+
+    # Return result
+    return render_template('User/user-main.html', flights=flights, username=username)
+
+# user book
+
+
+@app.route('/search_and_book_flight', methods=['GET', 'POST'])
+def search_and_book_flight():
+    # get data from form
+    airline_name = request.form['airline_name']
+    flight_number = request.form['flight_number']
+    departure_date_and_time = request.form['departure_date_and_time']
+    arrival_date_and_time = request.form['arrival_date_and_time']
+    arrival_airport_code = request.form['arrival_airport_code']
+    departure_airport_code = request.form['departure_airport_code']
+
+    # cursor used to send queries
+    cursor = conn.cursor()
+    # executes query
+    query = "SELECT * FROM Flight WHERE (departure_date_and_time>NOW() AND arrival_date_and_time>NOW()) AND (airline_name=%s OR flight_number=%s OR departure_date_and_time=%s  OR arrival_date_and_time=%s OR arrival_airport_code=%s OR departure_airport_code=%s)"
+    cursor.execute(query, (airline_name, flight_number, departure_date_and_time,
+                   arrival_date_and_time, arrival_airport_code, departure_airport_code))
+    # stores the results in a variable
+    flights = cursor.fetchall()
+    # use fetchall() if you are expecting more than 1 data row
+    cursor.close()
+    if len(flights) == 0:
+        # no flights
+        error = 'No flights found for the selected criteria.'
+        return render_template('User/user-flight-booking.html', error=error)
+
+    # Return result
     return render_template('User/user-flight-booking.html', flights=flights)
+# Purchase flight
+
+
+@app.route('/purchase_flight/<flight_number>', methods=['GET', 'POST'])
+def purchase_flight(flight_number):
+    flight_number = flight_number
+    email = session['email']
+    card_number = request.form['card_number']
+    card_type = request.form['card_type']
+    name = request.form['card_name']
+    expiration_date = request.form['expiration_date']
+
+    # cursor used to send queries
+    cursor = conn.cursor()
+
+    # add card information
+    query = "INSERT IGNORE INTO Payment_Information (card_number, card_type, name_on_card, expiration_date) VALUES (%s, %s, %s, %s);"
+    cursor.execute(query, (card_number, card_type, name, expiration_date))
+
+    # purcharse here
+
+    # find ticket ratio
+    """
+    1. find identification_number by flight_number in Fly table
+    2. use identification_number find number_of_seats in Airplane table and save as t_seats
+    3. find how many record of this flight_number in Ticket table as t_tickets
+    4. get purchase_ratio by t_tickets/t_seats
+    """
+    query = "SELECT COUNT(DISTINCT t.ticket_id) / a.number_of_seats AS purchase_ratio FROM Fly AS f JOIN Ticket AS t ON f.flight_number = t.flight_number JOIN Airplane AS a ON f.identification_number = a.identification_number WHERE f.flight_number = %s GROUP BY f.flight_number, a.number_of_seats;"
+    cursor.execute(query, (flight_number))
+    result = cursor.fetchone()
+    if result is not None:
+        purchase_ratio = result['purchase_ratio']
+    else:
+        purchase_ratio = 0
+
+    # insert ticket information
+    """
+    1. get email by session['email']
+    2. find first_name, last_name, date_of_birth in Customer table by email
+    3. get base_price_of_ticket by flight_number in Flight
+    4. calculate price of ticket 
+    5. find airline_name, flight_number, departure_date_time in Flight table by flight_number
+    6. extract data and Insert
+    """
+    query = "SELECT first_name, last_name, date_of_birth FROM Customer WHERE email_address = %s;"
+    cursor.execute(query, (email))
+    result = cursor.fetchone()
+    print(result)
+    first_name = result['first_name']
+    last_name = result['last_name']
+    date_of_birth = result['date_of_birth']
+
+    query = "SELECT base_price_of_ticket FROM Flight WHERE flight_number = %s ;"
+    cursor.execute(query, (flight_number))
+    result = cursor.fetchone()
+    base_price = result['base_price_of_ticket']
+    if purchase_ratio > 0.8:
+        calculated_price_of_ticket = base_price*1.2
+    else:
+        calculated_price_of_ticket = base_price
+
+    query = "SELECT airline_name, departure_date_and_time FROM Flight WHERE flight_number = %s ;"
+    cursor.execute(query, (flight_number))
+    result = cursor.fetchone()
+    airline_name = result['airline_name']
+    departure_date_and_time = result['departure_date_and_time']
+
+    query = "INSERT INTO `Ticket` (`ticket_ID`, `first_name`, `last_name`, `date_of_birth`, `calculated_price_of_ticket`, `airline_name`, `flight_number`, `departure_date_and_time`, `email_address`) VALUES (NULL, %s, %s, %s, %s, %s, %s, %s,%s);"
+    cursor.execute(query, (first_name, last_name, date_of_birth, calculated_price_of_ticket,
+                   airline_name, flight_number, departure_date_and_time, email))
+    ticket_ID = cursor.lastrowid
+    # insert ticket_ID, card_number and current date to Purcahse table
+    # get ticket ID
+
+    query = "INSERT INTO Purchase (ticket_ID,card_number, purchase_date_and_time) VALUES (%s,%s, NOW());"
+    cursor.execute(query, (ticket_ID, card_number))
+    conn.commit()
+    cursor.close()
+    return redirect(url_for('purchase_result'))
+
+# search and rate and comment
+
+
+@app.route('/search_and_rate', methods=['POST'])
+def search_and_rate():
+    email = session['email']
+    # get data from form
+    airline_name = request.form['airline_name']
+    flight_number = request.form['flight_number']
+    departure_date_and_time = request.form['departure_date_and_time']
+    rate = request.form['rating']
+    comment = request.form['comment']
+
+    # cursor used to send queries
+    cursor = conn.cursor()
+    # executes query
+    query = "INSERT INTO Evaluation (email_address,airline_name,flight_number,departure_date_and_time,rate,comment) VALUES (%s,%s,%s,%s,%s,%s);"
+    cursor.execute(query, (email, airline_name, flight_number,
+                   departure_date_and_time, rate, comment))
+    # use fetchall() if you are expecting more than 1 data row
+    conn.commit()
+    cursor.close()
+    # Return result
+    return render_template('User/user-rate-result.html')
 
 
 app.secret_key = 'some key that you will never guess'

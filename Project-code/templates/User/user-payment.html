@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Payment Information</title>
+  </head>
+  <body>
+    <h1>Payment Information</h1>
+    <form
+      action="{{ url_for('purchase_flight', flight_number=flight_number) }}"
+      method="POST"
+    >
+      <input type="hidden" name="flight_id" value="{{ flight_id }}" />
+      <div>
+        <label for="card_number">Card Number:</label>
+        <input type="text" name="card_number" required />
+      </div>
+      <div>
+        <label for="card_type">Card Type:</label>
+        <select name="card_type" required>
+          <option value="credit">Credit</option>
+          <option value="debit">Debit</option>
+        </select>
+      </div>
+      <div>
+        <label for="card_name">Card Name:</label>
+        <input type="text" name="card_name" required />
+      </div>
+      <div>
+        <label for="expiration_date">Expiration Date:</label>
+        <input
+          type="text"
+          name="expiration_date"
+          placeholder="MM/YY"
+          required
+        />
+      </div>
+      <div>
+        <button type="submit">Purchase</button>
+      </div>
+    </form>
+  </body>
+</html>

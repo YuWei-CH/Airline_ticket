@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Track My Spending</title>
+  </head>
+  <body>
+    <h1>Track My Spending</h1>
+    <h2>Default View: Total Amount Spent in Past Year</h2>
+    <p>Total amount spent in past year: $5000</p>
+
+    <h2>Monthly Spending for Last 6 Months</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Month</th>
+          <th>Amount Spent</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>January</td>
+          <td>$500</td>
+        </tr>
+        <tr>
+          <td>February</td>
+          <td>$750</td>
+        </tr>
+        <tr>
+          <td>March</td>
+          <td>$1000</td>
+        </tr>
+        <tr>
+          <td>April</td>
+          <td>$800</td>
+        </tr>
+        <tr>
+          <td>May</td>
+          <td>$650</td>
+        </tr>
+        <tr>
+          <td>June</td>
+          <td>$300</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>View Spending for Specific Date Range</h2>
+    <form action="/" method="POST">
+      <label for="start-date">Start Date:</label>
+      <input type="date" id="start-date" name="start-date" required />
+
+      <label for="end-date">End Date:</label>
+      <input type="date" id="end-date" name="end-date" required />
+
+      <button type="submit">View Spending</button>
+    </form>
+
+    {% if spending %}
+    <h2>Total Spending for Selected Date Range</h2>
+    <p>
+      Total amount spent between {{ start_date }} and {{ end_date }}: ${{
+      spending }}
+    </p>
+
+    <h2>Monthly Spending for Selected Date Range</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Month</th>
+          <th>Amount Spent</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>January</td>
+          <td>$300</td>
+        </tr>
+        <tr>
+          <td>February</td>
+          <td>$500</td>
+        </tr>
+        <tr>
+          <td>March</td>
+          <td>$750</td>
+        </tr>
+        <tr>
+          <td>April</td>
+          <td>$400</td>
+        </tr>
+        <tr>
+          <td>May</td>
+          <td>$200</td>
+        </tr>
+        <tr>
+          <td>June</td>
+          <td>$100</td>
+        </tr>
+      </tbody>
+    </table>
+    {% endif %}
+  </body>
+</html>

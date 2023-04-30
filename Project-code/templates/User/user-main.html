@@ -15,10 +15,10 @@
       <!-- navigator bar -->
       <nav>
         <ul>
-          <li><a href="user-flight-booking.html">Flight Booking</a></li>
-          <li><a href="user-track.html">My Ticket</a></li>
+          <li><a href="../User/user-flight-booking.html">Flight Booking</a></li>
+          <li><a href="/user-track">Rate My Ticket</a></li>
           <li><a href="#">Track Spend</a></li>
-          <li><a href="#">Log Out</a></li>
+          <li><a href="/logout">Log Out</a></li>
         </ul>
       </nav>
     </header>
@@ -26,6 +26,41 @@
       <!--View Future Flight-->
       <div>
         <h1 id="track-flight-heading">My Future Flights</h1>
+        <form action="{{ url_for('search_user_flights') }}" method="post">
+          <label for="flight_number">Flight Number:</label>
+          <input
+            type="text"
+            id="flight_number"
+            name="flight_number"
+          /><br /><br />
+          <label for="departure_date_and_time">Departure Date:</label>
+          <input
+            type="datetime-local"
+            id="departure_date_and_time"
+            name="departure_date_and_time"
+          /><br /><br />
+          <label for="arrival_date_and_time">Arrival Date:</label>
+          <input
+            type="datetime-local"
+            id="arrival_date_and_time"
+            name="arrival_date_and_time"
+          /><br /><br />
+          <label for="arrival_airport_code">Arrival Airport Code:</label>
+          <input
+            type="text"
+            id="arrival_airport_code"
+            name="arrival_airport_code"
+          /><br /><br />
+          <label for="departure_airport_code">Departure Airport Code:</label>
+          <input
+            type="text"
+            id="departure_airport_code"
+            name="departure_airport_code"
+          /><br /><br />
+          <!--submit and reset-->
+          <input type="submit" value="Search" />
+          <input type="reset" value="Clear" />
+        </form>
         <table>
           <thead>
             <tr>
@@ -33,8 +68,8 @@
               <th>Departure Date and Time</th>
               <th>Arrival Date and Time</th>
               <th>Price</th>
-              <th>Departure Airport</th>
               <th>Arrival Airport</th>
+              <th>Departure Airport</th>
             </tr>
           </thead>
           <tbody>

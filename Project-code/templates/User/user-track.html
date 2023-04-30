@@ -5,76 +5,136 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ticket Resrvation System</title>
-    <link rel="stylesheet" href="../CSS/user-track.css" />
+    <link rel="stylesheet" href="../CSS/user-main.css" />
   </head>
   <body>
-    <main>
-      <h1>View My Ticket</h1>
-      <!-- navigate bar -->
+    <!--Header-->
+    <header>
+      <!-- Welcome, {name}-->
+      <h1>View My Tickets</h1>
+      <!-- navigator bar -->
       <nav>
         <ul>
-          <li><a href="user-main.html">Back to Main</a></li>
-          <li><a href="#">Log Out</a></li>
+          <li><a href="/user-main">Back to Main</a></li>
+          <li><a href="/logout">Log Out</a></li>
         </ul>
       </nav>
-
-      <!--Track my ticket -->
+    </header>
+    <main>
+      <!--View Future Flight-->
       <div>
-        <h1 id="track-flight-heading">Track Flights</h1>
-        <form>
-          <label for="date-range">Filter by date range:</label>
-          <input type="date" id="start-date" name="start-date" />
-          <input type="date" id="end-date" name="end-date" />
-          <button type="submit">Filter</button>
-        </form>
-        <form>
-          <label for="destination">Filter by destination:</label>
-          <input type="text" id="destination" name="destination" />
-          <button type="submit">Filter</button>
-        </form>
-        <form>
-          <label for="source-airport">Filter by source airport:</label>
-          <input type="text" id="source-airport" name="source-airport" />
-          <button type="submit">Filter</button>
-        </form>
-        <form>
-          <label for="city-name">Filter by city name:</label>
-          <input type="text" id="city-name" name="city-name" />
-          <button type="submit">Filter</button>
+        <h1 id="track-flight-heading">My Previous Flights</h1>
+        <form action="{{ url_for('search_and_rate') }}" method="post">
+          <label for="airline_name">Airline Name:</label>
+          <input
+            type="text"
+            id="airline_name"
+            name="airline_name"
+          /><br /><br />
+          <label for="flight_number">Flight Number:</label>
+          <input
+            type="text"
+            id="flight_number"
+            name="flight_number"
+          /><br /><br />
+          <label for="departure_date_and_time">Departure Date:</label>
+          <input
+            type="datetime-local"
+            id="departure_date_and_time"
+            name="departure_date_and_time"
+          /><br /><br />
+          <label for="arrival_date_and_time">Arrival Date:</label>
+          <input
+            type="datetime-local"
+            id="arrival_date_and_time"
+            name="arrival_date_and_time"
+          /><br /><br />
+          <label for="arrival_airport_code">Arrival Airport Code:</label>
+          <input
+            type="text"
+            id="arrival_airport_code"
+            name="arrival_airport_code"
+          /><br /><br />
+          <label for="departure_airport_code">Departure Airport Code:</label>
+          <input
+            type="text"
+            id="departure_airport_code"
+            name="departure_airport_code"
+          /><br /><br />
+          <!--submit and reset-->
+          <input type="submit" value="Search" />
+          <input type="reset" value="Clear" />
         </form>
         <table>
           <thead>
             <tr>
+              <th>Airline Name</th>
               <th>Flight Number</th>
-              <th>Departure Date</th>
-              <th>Arrival Date</th>
-              <th>Departure Airport</th>
+              <th>Departure Date and Time</th>
+              <th>Arrival Date and Time</th>
+              <th>Price</th>
               <th>Arrival Airport</th>
+              <th>Departure Airport</th>
             </tr>
           </thead>
           <tbody>
-            <!--test data -->
-            <tr>
-              <td>CA123</td>
-              <td>2023-05-01</td>
-              <td>2023-05-01</td>
-              <td>PEK</td>
-              <td>JFK</td>
-            </tr>
-            <!--flask template-->
             <!-- flight data will be populated here dynamically -->
+            <!--flask template-->
             {% for flight in flights %}
             <tr>
+              <td>{{ flight.airline_name }}</td>
               <td>{{ flight.flight_number }}</td>
-              <td>{{ flight.departure_date }}</td>
-              <td>{{ flight.arrival_date }}</td>
-              <td>{{ flight.departure_airport }}</td>
-              <td>{{ flight.arrival_airport }}</td>
+              <td>{{ flight.departure_date_and_time }}</td>
+              <td>{{ flight.arrival_date_and_time }}</td>
+              <td>{{ flight.calculated_price_of_ticket }}</td>
+              <td>{{ flight.arrival_airport_code }}</td>
+              <td>{{ flight.departure_airport_code }}</td>
+              <td>
+                <form method="POST" action="{{ url_for('search_and_rate') }}">
+                  <select name="rating" required>
+                    <option value="" selected disabled hidden>Rate</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                  </select>
+                  <input
+                    type="text"
+                    name="comment"
+                    placeholder="Enter your comment"
+                    required
+                  />
+                  <input
+                    type="hidden"
+                    name="airline_name"
+                    value="{{ flight.airline_name }}"
+                  />
+                  <input
+                    type="hidden"
+                    name="flight_number"
+                    value="{{ flight.flight_number }}"
+                  />
+                  <input
+                    type="hidden"
+                    name="departure_date_and_time"
+                    value="{{ flight.departure_date_and_time }}"
+                  />
+                  <input type="submit" value="Submit" />
+                </form>
+              </td>
             </tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
+
+      <!--Track Spending-->
     </main>
   </body>
 </html>
