@@ -1,7 +1,8 @@
 # Import Flask Library
 from flask import Flask, render_template, request, session, url_for, redirect
 import pymysql.cursors
-
+import datetime
+import calendar
 
 # Initialize the app from Flask
 app = Flask(__name__)
@@ -175,6 +176,7 @@ def user_main():
     cursor.execute(query, (email))
     # stores the results in a variable
     flights = cursor.fetchall()
+    cursor.close()
     return render_template('User/user-main.html', username=username, flights=flights)
 
 
@@ -195,6 +197,8 @@ def serve_css(path):
     """Serve CSS files"""
     return "", 404 if not path.endswith('.css') else 200
 
+# render rate flight
+
 
 @app.route('/user-track', methods=['GET', 'POST'])
 def user_track():
@@ -206,12 +210,64 @@ def user_track():
     cursor.execute(query, (email))
     # stores the results in a variable
     flights = cursor.fetchall()
+    cursor.close()
     return render_template('User/user-track.html', flights=flights)
+
+# display result of rating
 
 
 @app.route('/rate-result', methods=['GET', 'POST'])
 def rate_result():
     return render_template('User/user-rate-result.html')
+
+
+# dispaly 1 year and 6 month spending
+@app.route("/user-spend")
+def track_spending():
+
+    # get current month and year
+    now = datetime.datetime.now()
+    current_month = now.month
+    current_year = now.year
+
+    email = session['email']
+    # cursor used to send queries
+    cursor = conn.cursor()
+
+    # query past 1 year
+    query = "SELECT SUM(t.calculated_price_of_ticket) FROM Ticket t JOIN Purchase p ON t.ticket_ID = p.ticket_ID WHERE t.email_address = %s AND p.purchase_date_and_time >= DATE_SUB(NOW(), INTERVAL 1 YEAR);"
+    cursor.execute(query, (email))
+    total_spending = cursor.fetchone()['SUM(t.calculated_price_of_ticket)']
+
+    # data store in `spending_data`
+    # key of spending_data month, value is spending
+
+    # get past 6 month
+    date_ranges = [(now - datetime.timedelta(days=30*i+29),
+                    now - datetime.timedelta(days=30*i)) for i in range(6)]
+    monthly_spending = {}
+    for date_range in date_ranges:
+        start_date = date_range[0].strftime('%Y-%m-%d 00:00:00')
+        end_date = date_range[1].strftime('%Y-%m-%d 23:59:59')
+        # print(start_date, end_date)
+        query = "SELECT SUM(t.calculated_price_of_ticket) FROM Ticket t JOIN Purchase p ON t.ticket_ID = p.ticket_ID WHERE t.email_address = %s AND p.purchase_date_and_time BETWEEN %s AND %s;"
+        cursor.execute(query, (email, start_date, end_date))
+        monthly_spend = cursor.fetchone()['SUM(t.calculated_price_of_ticket)']
+        # print(monthly_spend)
+        if monthly_spend is None:
+            monthly_spend = 0
+        month_year = date_range[0].strftime('%B %Y')
+        monthly_spending[month_year] = monthly_spend
+    if 'specific_monthly_spending' in session:
+        specific_monthly_spending = session['specific_monthly_spending']
+    else:
+        specific_monthly_spending = None
+
+    cursor.close()
+    # send data back
+    return render_template("User/user-spend.html",
+                           total_spending=total_spending,
+                           monthly_spending=monthly_spending, specific_monthly_spending=specific_monthly_spending)
 
 
 """
@@ -386,6 +442,47 @@ def search_and_rate():
     cursor.close()
     # Return result
     return render_template('User/user-rate-result.html')
+
+# track user spend specifically
+
+
+@app.route('/track-specific-spend', methods=['POST'])
+def track_specific_spend():
+    cursor = conn.cursor()
+    email = session['email']
+    start_date = request.form['start-date']
+    end_date = request.form['end-date']
+
+    # get monthly spending
+    start_year, start_month, _ = start_date.split('-')
+    end_year, end_month, _ = end_date.split('-')
+    start_month = int(start_month)
+    end_month = int(end_month)
+    year_diff = int(end_year) - int(start_year)
+    month_diff = end_month - start_month + 1 + year_diff * 12
+    specific_monthly_spending = {}
+    for i in range(month_diff):
+        year = start_year
+        month = start_month + i
+        if month > 12:
+            year = str(int(year) + 1)
+            month -= 12
+        last_day = calendar.monthrange(int(year), month)[1]
+        start_time = "00:00:00"
+        end_time = "23:59:59"
+        date_range = (f"{year}-{month:02}-01 {start_time}",
+                      f"{year}-{month:02}-{last_day} {end_time}")
+        query = "SELECT SUM(t.calculated_price_of_ticket) FROM Ticket t JOIN Purchase p ON t.ticket_ID = p.ticket_ID WHERE t.email_address = %s AND p.purchase_date_and_time BETWEEN %s AND %s;"
+        cursor.execute(query, (email, date_range[0], date_range[1]))
+        monthly_spend = cursor.fetchone()['SUM(t.calculated_price_of_ticket)']
+        if monthly_spend is None:
+            monthly_spend = 0
+        month_year = f"{calendar.month_name[month]} {year}"
+        specific_monthly_spending[month_year] = monthly_spend
+        session['specific_monthly_spending'] = specific_monthly_spending
+    cursor.close()
+    # send data back
+    return redirect(url_for('track_spending'))
 
 
 app.secret_key = 'some key that you will never guess'

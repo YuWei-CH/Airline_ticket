@@ -3,10 +3,21 @@
   <head>
     <title>Track My Spending</title>
   </head>
-  <body>
+  <header>
     <h1>Track My Spending</h1>
-    <h2>Default View: Total Amount Spent in Past Year</h2>
-    <p>Total amount spent in past year: $5000</p>
+    <!-- navigator bar -->
+    <nav>
+      <ul>
+        <li><a href="/user-main">Back to Main</a></li>
+        <li><a href="/logout">Log Out</a></li>
+      </ul>
+    </nav>
+  </header>
+  <body>
+    <h2>Total Amount Spent in Past Year:</h2>
+    <p>
+      Total amount spent in <strong>past year</strong>: ${{ total_spending }}
+    </p>
 
     <h2>Monthly Spending for Last 6 Months</h2>
     <table>
@@ -17,35 +28,17 @@
         </tr>
       </thead>
       <tbody>
+        {% for month, spending in monthly_spending.items() %}
         <tr>
-          <td>January</td>
-          <td>$500</td>
+          <td>{{ month }}</td>
+          <td>${{ spending }}</td>
         </tr>
-        <tr>
-          <td>February</td>
-          <td>$750</td>
-        </tr>
-        <tr>
-          <td>March</td>
-          <td>$1000</td>
-        </tr>
-        <tr>
-          <td>April</td>
-          <td>$800</td>
-        </tr>
-        <tr>
-          <td>May</td>
-          <td>$650</td>
-        </tr>
-        <tr>
-          <td>June</td>
-          <td>$300</td>
-        </tr>
+        {% endfor %}
       </tbody>
     </table>
 
     <h2>View Spending for Specific Date Range</h2>
-    <form action="/" method="POST">
+    <form action="/track-specific-spend" method="POST">
       <label for="start-date">Start Date:</label>
       <input type="date" id="start-date" name="start-date" required />
 
@@ -55,13 +48,7 @@
       <button type="submit">View Spending</button>
     </form>
 
-    {% if spending %}
-    <h2>Total Spending for Selected Date Range</h2>
-    <p>
-      Total amount spent between {{ start_date }} and {{ end_date }}: ${{
-      spending }}
-    </p>
-
+    {% if specific_monthly_spending %}
     <h2>Monthly Spending for Selected Date Range</h2>
     <table>
       <thead>
@@ -71,30 +58,12 @@
         </tr>
       </thead>
       <tbody>
+        {% for month, spend in specific_monthly_spending.items() %}
         <tr>
-          <td>January</td>
-          <td>$300</td>
+          <td>{{ month }}</td>
+          <td>${{ spend }}</td>
         </tr>
-        <tr>
-          <td>February</td>
-          <td>$500</td>
-        </tr>
-        <tr>
-          <td>March</td>
-          <td>$750</td>
-        </tr>
-        <tr>
-          <td>April</td>
-          <td>$400</td>
-        </tr>
-        <tr>
-          <td>May</td>
-          <td>$200</td>
-        </tr>
-        <tr>
-          <td>June</td>
-          <td>$100</td>
-        </tr>
+        {% endfor %}
       </tbody>
     </table>
     {% endif %}
