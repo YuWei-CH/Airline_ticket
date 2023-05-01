@@ -1,0 +1,58 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ticket Resrvation System</title>
+  </head>
+  <body>
+    <h1>Please fill your personal date here</h1>
+    <form action="/registerAuth" method="POST">
+      <label for="username">User Name:</label>
+      <input type="text" id="username" name="username" required /><br />
+
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required /><br />
+
+      <label for="first_name">First Name:</label>
+      <input type="text" id="first_name" name="first_name" required /><br />
+
+      <label for="last_name">Last Name:</label>
+      <input type="text" id="last_name" name="last_name" required /><br />
+
+      <label for="email1">Email Address 1:</label>
+      <input type="email" id="email1" name="email1" required /><br />
+
+      <label for="email2">Email Address 2:</label>
+      <input type="email" id="email2" name="email2" /><br />
+
+      <label for="phone_number1">Phone Number1:</label>
+      <input
+        type="tel"
+        id="phone_number1"
+        name="phone_number1"
+        required
+      /><br />
+
+      <label for="phone_number2">Phone Number2:</label>
+      <input type="tel" id="phone_number2" name="phone_number2" /><br />
+
+      <label for="date_of_birth">Date of Birth:</label>
+      <input
+        type="date"
+        id="date_of_birth"
+        name="date_of_birth"
+        required
+      /><br />
+
+      <label for="airline_name">Airline Name:</label>
+      <input type="text" id="airline_name" name="airline_name" required /><br />
+
+      <input type="submit" value="Register" />
+      {% if error %}
+      <p class="error"><strong>Error:</strong> {{error}}</p>
+      {% endif %}
+    </form>
+    <a href="/">Go back</a>
+  </body>
+</html>

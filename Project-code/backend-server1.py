@@ -28,8 +28,7 @@ def hello():
 
 @app.route('/logout')
 def logout():
-    session.pop('username')
-    session.pop('email')
+    session.clear()
     return redirect('/')
 
 
@@ -139,8 +138,7 @@ def registerAuth():
         city = request.form['city']
         state = request.form['state']
         zip_code = request.form['zip_code']
-        phone_number1 = request.form['phone_number1']
-        phone_number2 = request.form['phone_number2']
+        phone_number = request.form['phone_number']
         passport_number = request.form['passport_number']
         passport_expiration = request.form['passport_expiration']
         passport_country = request.form['passport_country']
@@ -162,10 +160,17 @@ def registerAuth():
         error = "This user already exists"
         return render_template('User/user-register.html', error=error)
     else:
-        ins = "INSERT INTO Customer (email_address,first_name, last_name, c_password, building_number, street_name, apartment_number, city, state, zip_code, phone_number1, phone_number2, passport_number, passport_expiration, passport_country, date_of_birth) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s)"
+        ins = "INSERT INTO Customer (email_address,first_name, last_name, c_password, building_number, street_name, apartment_number, city, state, zip_code, passport_number, passport_expiration, passport_country, date_of_birth) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s)"
         cursor.execute(ins, (email, first_name, last_name, hashed_password, building_number, street_name, apartment_number, city,
-                             state, zip_code, phone_number1, phone_number2, passport_number, passport_expiration, passport_country, date_of_birth))
+                             state, zip_code, passport_number, passport_expiration, passport_country, date_of_birth))
         conn.commit()
+        phone_list = phone_number.split(";")
+        # insert phone number
+        for i in phone_list:
+            phone_ins = "INSERT INTO CustCustomer_Phone_Numberomer (email_address, phone_number) VALUES (%s,%s)"
+            cursor.execute(phone_ins, (email, i))
+            conn.commit()
+        # conn.commit()
         cursor.close()
         return render_template('index.html')
 
