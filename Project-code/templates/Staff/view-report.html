@@ -5,6 +5,79 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>View Reports</title>
+    <style>
+      #home,
+      #logout {
+        position: fixed;
+        top: 25px;
+        color: black;
+        text-decoration: none;
+      }
+
+      #home:hover,
+      #logout:hover {
+        text-decoration: underline;
+      }
+
+      #home {
+        right: 100px;
+      }
+
+      #logout {
+        right: 25px;
+      }
+
+      table {
+        width: 100%;
+        border: 1px solid black;
+      }
+
+      th,
+      td {
+        border: 1px solid black;
+      }
+    </style>
   </head>
-  <body></body>
+  <body>
+    <div>
+      <h1>View Reports</h1>
+      <a id="home" href="staff-main.html">Home</a>
+      <a id="logout" href="/logout">Log Out</a>
+    </div>
+
+    <h2>Search for the total amounts of ticket sold:</h2>
+    <form action="/ticketReport" method="POST">
+      <label for="start-date">Starting From: </label>
+      <input type="date" name="start-date" id="start-date" />
+      <label for="end-date">To: </label>
+      <input type="date" name="end-date" id="end-date" />
+      <input type="submit" value="Search" />
+    </form>
+    <h2>Total Amounts of Ticket Sold From {date} to {date}:</h2>
+    <h2>Total Amounts of Ticket Sold Last Month:</h2>
+    <h2>Total Amounts of Ticket Sold Last Year:</h2>
+    <h2>Month Wise Tickets Sold:</h2>
+    <table>
+      <tr>
+        <th>January</th>
+        <th>Feburary</th>
+        <th>March</th>
+        <th>April</th>
+        <th>May</th>
+        <th>June</th>
+        <th>July</th>
+        <th>August</th>
+        <th>September</th>
+        <th>October</th>
+        <th>November</th>
+        <th>December</th>
+      </tr>
+      <tr></tr>
+    </table>
+    <br /><br />
+    <h2>Most Frequent Customer Within Last Year:</h2>
+    <br />
+    <h2>Total Revenue (Last Month):</h2>
+    <h2>Total Revenue (Last Year):</h2>
+  </body>
 </html>

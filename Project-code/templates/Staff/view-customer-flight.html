@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>View Customer's Flight</title>
+    <style>
+      table {
+        width: 100%;
+        border: 1px solid black;
+      }
+
+      th,
+      td {
+        border: 1px solid black;
+      }
+
+      #home,
+      #logout {
+        position: fixed;
+        top: 25px;
+        color: black;
+        text-decoration: none;
+      }
+
+      #home:hover,
+      #logout:hover {
+        text-decoration: underline;
+      }
+
+      #home {
+        right: 100px;
+      }
+
+      #logout {
+        right: 25px;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <h1>View Customer's Flight</h1>
+      <a id="home" href="staff-main.html">Home</a>
+      <a id="logout" href="/logout">Log Out</a>
+    </div>
+
+    <form action="/viewCustomerFlight" method="POST">
+      <label for="email">Email Address: </label>
+      <input type="email" name="email" id="email" required />
+      <br /><br />
+      <input type="submit" value="Search" />
+      <br /><br />
+    </form>
+
+    <table>
+      <tr>
+        <th>Flight Number</th>
+        <th>Departure Date and Time</th>
+        <th>Arrival Date and Time</th>
+        <th>Departure Airport</th>
+        <th>Arrival Airport</th>
+        <th>Base Price of Ticket</th>
+      </tr>
+      <tr></tr>
+    </table>
+  </body>
+</html>
