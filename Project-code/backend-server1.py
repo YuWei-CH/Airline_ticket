@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, session, url_for, redirect
 import pymysql.cursors
 import datetime
 import calendar
+import hashlib
 
 # Initialize the app from Flask
 app = Flask(__name__)
@@ -94,17 +95,19 @@ def loginAuth():
     email = request.form['email']
     password = request.form['password']
 
+    # get hashed password
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()
     # cursor used to send queries
     cursor = conn.cursor()
     # executes query
     query = 'SELECT * FROM Customer WHERE email_address = %s and c_password = %s'
-    cursor.execute(query, (email, password))
+    cursor.execute(query, (email, hashed_password))
     # stores the results in a variable
     data = cursor.fetchone()
     # use fetchall() if you are expecting more than 1 data row
     # search name
     name_query = 'SELECT first_name FROM Customer WHERE email_address = %s and c_password = %s'
-    cursor.execute(name_query, (email, password))
+    cursor.execute(name_query, (email, hashed_password))
     # stores the results in a variable
     name = cursor.fetchone()
     cursor.close()
@@ -143,6 +146,8 @@ def registerAuth():
         passport_country = request.form['passport_country']
         date_of_birth = request.form['date_of_birth']
 
+    #  hash the password
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()
     # cursor used to send queries
     cursor = conn.cursor()
     # executes query
@@ -158,7 +163,7 @@ def registerAuth():
         return render_template('User/user-register.html', error=error)
     else:
         ins = "INSERT INTO Customer (email_address,first_name, last_name, c_password, building_number, street_name, apartment_number, city, state, zip_code, phone_number1, phone_number2, passport_number, passport_expiration, passport_country, date_of_birth) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s)"
-        cursor.execute(ins, (email, first_name, last_name, password, building_number, street_name, apartment_number, city,
+        cursor.execute(ins, (email, first_name, last_name, hashed_password, building_number, street_name, apartment_number, city,
                              state, zip_code, phone_number1, phone_number2, passport_number, passport_expiration, passport_country, date_of_birth))
         conn.commit()
         cursor.close()
