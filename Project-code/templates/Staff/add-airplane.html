@@ -6,26 +6,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Add Airplane</title>
     <style>
-      #home {
+      #home,
+      #logout {
         position: fixed;
         top: 25px;
-        right: 25px;
         color: black;
         text-decoration: none;
       }
 
-      #home:hover {
+      #home:hover,
+      #logout:hover {
         text-decoration: underline;
       }
 
-      table {
-        width: 100%;
-        border: 1px solid black;
+      #home {
+        right: 100px;
       }
 
-      th,
-      td {
-        border: 1px solid black;
+      #logout {
+        right: 25px;
       }
     </style>
   </head>
@@ -33,6 +32,7 @@
     <div>
       <h1>Add Airplane</h1>
       <a id="home" href="staff-main.html">Home</a>
+      <a id="logout" href="/logout">Log Out</a>
     </div>
 
     <form action="/addAirplane" method="POST">
@@ -70,15 +70,5 @@
       <br /><br />
       <input type="submit" value="Add" />
     </form>
-    <h2>All Airplanes Owned By XXX</h2>
-    <table>
-      <tr>
-        <th>Identification Number</th>
-        <th>Number of Seats</th>
-        <th>Manufacturing Company</th>
-        <th>Manufacture Date</th>
-      </tr>
-      <tr></tr>
-    </table>
   </body>
 </html>

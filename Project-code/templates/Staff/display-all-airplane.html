@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>View Customers</title>
+    <title>All Airplane</title>
     <style>
       table {
         width: 100%;
@@ -40,34 +40,18 @@
   </head>
   <body>
     <div>
-      <h1>View Customers</h1>
+      <h1>You have successfully add an airplane!</h1>
       <a id="home" href="staff-main.html">Home</a>
       <a id="logout" href="/logout">Log Out</a>
     </div>
 
-    <form action="/viewCustomers" method="POST">
-      <label for="flight-number">Flight Number: </label>
-      <input type="text" name="flight-number" id="flight-number" required />
-      <br /><br />
-      <label for="departure-date-and-time">Departure Date and Time: </label>
-      <input
-        type="datetime-local"
-        name="departure-date-and-time"
-        id="departure-date-and-time"
-        required
-      />
-      <br /><br />
-      <input type="submit" value="Search" />
-      <br /><br />
-    </form>
+    <h2>All Airplanes Owned By XXX</h2>
     <table>
       <tr>
-        <th>Email Address</th>
-        <th>First Name</th>
-        <th>Last Name</th>
-        <th>Date of Birth</th>
-        <th>Passport Number</th>
-        <th>Phone Number</th>
+        <th>Identification Number</th>
+        <th>Number of Seats</th>
+        <th>Manufacturing Company</th>
+        <th>Manufacture Date</th>
       </tr>
       <tr></tr>
     </table>
