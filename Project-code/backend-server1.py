@@ -502,8 +502,8 @@ def search_and_rate():
 def track_specific_spend():
     cursor = conn.cursor()
     email = session['email']
-    start_date = request.form['start-date']
-    end_date = request.form['end-date']
+    start_date = request.form['start-date'] + "00:00:00"
+    end_date = request.form['end-date'] + "23:59:59"
     query = "SELECT SUM(t.calculated_price_of_ticket) FROM Ticket t JOIN Purchase p ON t.ticket_ID = p.ticket_ID WHERE t.email_address = %s AND p.purchase_date_and_time BETWEEN %s AND %s;"
     cursor.execute(query, (email, start_date, end_date))
     total_monthly_spend = cursor.fetchone(
