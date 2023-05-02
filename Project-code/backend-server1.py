@@ -7,7 +7,7 @@ import hashlib
 
 # Initialize the app from Flask
 app = Flask(__name__)
-
+'''
 # Configure MySQL
 conn = pymysql.connect(host='localhost',
                        port=8889,
@@ -16,9 +16,19 @@ conn = pymysql.connect(host='localhost',
                        db='Test-flight',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
+'''
 
+# Configure MySQL
+conn = pymysql.connect(host='localhost',
+                       user='root',
+                       password='',
+                       db='air_ticket_system',
+                       charset='utf8mb4',
+                       cursorclass=pymysql.cursors.DictCursor)
 
 # Define a route to hello function
+
+
 @app.route('/')
 def hello():
     return render_template('index.html')
@@ -160,14 +170,14 @@ def registerAuth():
         error = "This user already exists"
         return render_template('User/user-register.html', error=error)
     else:
-        ins = "INSERT INTO Customer (email_address,first_name, last_name, c_password, building_number, street_name, apartment_number, city, state, zip_code, passport_number, passport_expiration, passport_country, date_of_birth) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s)"
+        ins = "INSERT INTO Customer (email_address,first_name, last_name, c_password, building_number, street_name, apartment_number, city, state, zip_code, passport_number, passport_expiration, passport_country, date_of_birth) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s, %s)"
         cursor.execute(ins, (email, first_name, last_name, hashed_password, building_number, street_name, apartment_number, city,
                              state, zip_code, passport_number, passport_expiration, passport_country, date_of_birth))
         conn.commit()
         phone_list = phone_number.split(";")
         # insert phone number
         for i in phone_list:
-            phone_ins = "INSERT INTO CustCustomer_Phone_Numberomer (email_address, phone_number) VALUES (%s,%s)"
+            phone_ins = "INSERT INTO Customer_Phone_Number (email_address, phone_number) VALUES (%s,%s)"
             cursor.execute(phone_ins, (email, i))
             conn.commit()
         # conn.commit()
@@ -220,6 +230,7 @@ def user_track():
     cursor.execute(query, (email))
     # stores the results in a variable
     flights = cursor.fetchall()
+    print(flights)
     cursor.close()
     return render_template('User/user-track.html', flights=flights)
 
@@ -237,8 +248,8 @@ def track_spending():
 
     # get current month and year
     now = datetime.datetime.now()
-    current_month = now.month
-    current_year = now.year
+    # current_month = now.month
+    # current_year = now.year
 
     email = session['email']
     # cursor used to send queries
@@ -253,21 +264,30 @@ def track_spending():
     # key of spending_data month, value is spending
 
     # get past 6 month
-    date_ranges = [(now - datetime.timedelta(days=30*i+29),
-                    now - datetime.timedelta(days=30*i)) for i in range(6)]
+    now = datetime.datetime.now()
+    date_ranges = []
+    for i in range(6):
+        year = now.year
+        month = now.month - i
+        if month <= 0:
+            month += 12
+            year -= 1
+        end_of_month = calendar.monthrange(year, month)[1]
+        end_date = now.replace(year=year, month=month, day=end_of_month)
+        start_date = end_date.replace(day=1)
+        date_ranges.append((start_date, end_date))
     monthly_spending = {}
     for date_range in date_ranges:
         start_date = date_range[0].strftime('%Y-%m-%d 00:00:00')
         end_date = date_range[1].strftime('%Y-%m-%d 23:59:59')
-        # print(start_date, end_date)
         query = "SELECT SUM(t.calculated_price_of_ticket) FROM Ticket t JOIN Purchase p ON t.ticket_ID = p.ticket_ID WHERE t.email_address = %s AND p.purchase_date_and_time BETWEEN %s AND %s;"
         cursor.execute(query, (email, start_date, end_date))
         monthly_spend = cursor.fetchone()['SUM(t.calculated_price_of_ticket)']
-        # print(monthly_spend)
         if monthly_spend is None:
-            monthly_spend = 0
+            monthly_spend = 0  # if no spending, set it to 0
         month_year = date_range[0].strftime('%B %Y')
         monthly_spending[month_year] = monthly_spend
+        print(date_range)
     if 'specific_monthly_spending' in session:
         specific_monthly_spending = session['specific_monthly_spending']
     else:
@@ -438,20 +458,30 @@ def search_and_rate():
     airline_name = request.form['airline_name']
     flight_number = request.form['flight_number']
     departure_date_and_time = request.form['departure_date_and_time']
-    rate = request.form['rating']
-    comment = request.form['comment']
-
-    # cursor used to send queries
     cursor = conn.cursor()
-    # executes query
-    query = "INSERT INTO Evaluation (email_address,airline_name,flight_number,departure_date_and_time,rate,comment) VALUES (%s,%s,%s,%s,%s,%s);"
-    cursor.execute(query, (email, airline_name, flight_number,
-                   departure_date_and_time, rate, comment))
-    # use fetchall() if you are expecting more than 1 data row
-    conn.commit()
-    cursor.close()
-    # Return result
-    return render_template('User/user-rate-result.html')
+
+    query = "SELECT * FROM (SELECT f.airline_name, f.departure_date_and_time, f.arrival_date_and_time, f.arrival_airport_code, f.departure_airport_code, f.flight_number FROM Ticket t JOIN Flight f ON f.flight_number=t.flight_number WHERE email_address= %s) AS derived_table_alias WHERE arrival_date_and_time < NOW();"
+    cursor.execute(query, (email))
+    # stores the results in a variable
+    flights = cursor.fetchall()
+    if len(flights) > 0:
+        rate = request.form['rating']
+        comment = request.form['comment']
+
+        # cursor used to send queries
+        # executes query
+        # print(email)
+        query = "INSERT INTO Evaluation (email_address,airline_name,flight_number,departure_date_and_time,rate,comment) VALUES (%s,%s,%s,%s,%s,%s);"
+        cursor.execute(query, (email, airline_name, flight_number,
+                               departure_date_and_time, rate, comment))
+        # use fetchall() if you are expecting more than 1 data row
+        conn.commit()
+        cursor.close()
+        # Return result
+        return render_template('User/user-rate-result.html')
+    else:
+        cursor.close()
+        return render_template('User/user-track.html', flights=flights)
 
 # track user spend specifically
 

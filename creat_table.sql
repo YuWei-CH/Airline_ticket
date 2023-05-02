@@ -82,7 +82,7 @@ CREATE TABLE Customer_Phone_Number (
 );
 
 CREATE TABLE Ticket (
-  ticket_ID VARCHAR(20),
+  ticket_ID INT(11) AUTO_INCREMENT,
   first_name VARCHAR(20) NOT NULL,
   last_name VARCHAR(20) NOT NULL,
   date_of_birth DATE NOT NULL,
@@ -110,31 +110,31 @@ CREATE TABLE Evaluation (
 
 CREATE TABLE Airline_Staff (
   username VARCHAR(20),
-  s_password VARCHAR(255) NOT NULL, 
+  s_password VARCHAR(255) NOT NULL,
   first_name VARCHAR(20) NOT NULL,
   last_name VARCHAR(20) NOT NULL,
   date_of_birth DATE NOT NULL,
-  airline_name VARCHAR(20) NOT NULL, 
-  PRIMARY KEY (username), 
+  airline_name VARCHAR(20) NOT NULL,
+  PRIMARY KEY (username),
   FOREIGN KEY (airline_name) REFERENCES Airline(name)
 );
 
 CREATE TABLE Staff_Email (
-  username VARCHAR(20), 
+  username VARCHAR(20),
   email_address VARCHAR(50),
-  PRIMARY KEY (username, email_address), 
+  PRIMARY KEY (username, email_address),
   FOREIGN KEY (username) REFERENCES Airline_Staff(username) ON DELETE CASCADE
 );
 
 CREATE TABLE Staff_Phone_Number (
-  username VARCHAR(20), 
+  username VARCHAR(20),
   phone_number VARCHAR(20),
-  PRIMARY KEY (username, phone_number), 
+  PRIMARY KEY (username, phone_number),
   FOREIGN KEY (username) REFERENCES Airline_Staff(username) ON DELETE CASCADE
 );
 
 CREATE TABLE Purchase (
-  ticket_ID VARCHAR(20),
+  ticket_ID INT(11),
   card_number VARCHAR(20),
   purchase_date_and_time TIMESTAMP NOT NULL,
   PRIMARY KEY (ticket_ID, card_number),
