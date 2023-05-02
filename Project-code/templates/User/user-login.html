@@ -3,14 +3,17 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ticket Resrvation System</title>
+    <title>User Login</title>
   </head>
   <body>
     <h1>User login</h1>
     <form action="/loginAuth" method="POST">
-      <input type="text" name="email" placeholder="email" required /> <br />
-      <input type="password" name="password" placeholder="password" required />
-      <br />
+      <label for="email">Email Address: </label>
+      <input type="email" name="email" id="email" required />
+      <br /><br />
+      <label for="password">Password: </label>
+      <input type="password" name="password" id="password" required />
+      <br /><br />
       <input type="submit" value="Login" />
       {% if error %}
       <p class="error"><strong>Error:</strong> {{error}}</p>

@@ -13,7 +13,8 @@
     <a href="User/user-login.html">User Login</a> |
     <a href="User/user-register.html">User Register</a>
     <br />
-    <a href="#">Staff Login</a> | <a href="#">Staff Register</a>
+    <a href="Staff/staff-login.html">Staff Login</a> |
+    <a href="Staff/staff-register.html">Staff Register</a>
     <br />
     <br />
     <form action="{{ url_for('search_flights') }}" method="post">
@@ -48,6 +49,7 @@
       <!--submit and reset-->
       <input type="submit" value="Search" />
       <input type="reset" value="Clear" />
+      <br /><br />
     </form>
     {% if error %}
     <p class="error"><strong>Error:</strong> {{error}}</p>

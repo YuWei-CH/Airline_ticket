@@ -10,7 +10,7 @@ app = Flask(__name__)
 conn = pymysql.connect(host='localhost',
                        user='root',
                        password='',
-                       db='blog',
+                       db='air_ticket_system',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
 
@@ -44,8 +44,8 @@ def register():
 # Authenticates the login
 
 
-@app.route('/loginAuth', methods=['GET', 'POST'])
-def loginAuth():
+@app.route('/staffLoginAuth', methods=['GET', 'POST'])
+def staffLoginAuth():
     # grabs information from the forms
     username = request.form['username']
     password = request.form['password']
@@ -60,6 +60,9 @@ def loginAuth():
     # stores the results in a variable
     data = cursor.fetchone()
     # use fetchall() if you are expecting more than 1 data row
+    # search name
+    name_query = 'SELECT first_name FROM Airline_Staff WHERE username = %s and s_password = %s'
+    cursor.execute(name_query, (username, hashed_password))
     # stores the results in a variable
     name = cursor.fetchone()
     cursor.close()
@@ -68,26 +71,25 @@ def loginAuth():
         # creates a session for the the user
         # session is a built in
         session['username'] = username
+        session['name'] = name
         return redirect(url_for('staff_main'))
     else:
         # returns an error message to the html page
-        error = 'Invalid login or email'
+        error = 'Invalid username or password!'
         return render_template('Staff/staff-login.html', error=error)
 
 
 # Authenticates the register
-@app.route('/registerAuth', methods=['GET', 'POST'])
-def registerAuth():
+@app.route('/staffRegisterAuth', methods=['GET', 'POST'])
+def staffRegisterAuth():
     if request.method == 'POST':
         # grabs information from the forms
         username = request.form['username']
         first_name = request.form['first_name']
         last_name = request.form['last_name']
         password = request.form['password']
-        email1 = request.form['email1']
-        email2 = request.form['email2']
-        phone_number1 = request.form['phone_number1']
-        phone_number2 = request.form['phone_number2']
+        email = request.form['email']
+        phone_number = request.form['phone_number']
         date_of_birth = request.form['date_of_birth']
         airline_name = request.form['airline_name']
 
@@ -107,12 +109,73 @@ def registerAuth():
         error = "This user already exists"
         return render_template('Staff/staff-register.html', error=error)
     else:
-        ins = "INSERT INTO Airline_Staff (username, s_password, first_name, last_name, date_of_birth, airline_name) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s)"
-        cursor.execute(ins, (username, first_name, last_name, hashed_password, building_number, street_name, apartment_number, city,
-                             state, zip_code, phone_number1, phone_number2, passport_number, passport_expiration, passport_country, date_of_birth))
+        ins = "INSERT INTO Airline_Staff (username, s_password, first_name, last_name, date_of_birth, airline_name) VALUES (%s, %s, %s, %s, %s, %s)"
+        cursor.execute(ins, (username, hashed_password, first_name,
+                       last_name, date_of_birth, airline_name))
         conn.commit()
+
+        email_list = email.split(";")
+        # insert email
+        for i in email_list:
+            email_ins = "INSERT INTO Staff_Email (username, email_address) VALUES (%s, %s)"
+            cursor.execute(email_ins, (username, i))
+            conn.commit()
+
+        phone_list = phone_number.split(";")
+        # insert phone number
+        for i in phone_list:
+            phone_ins = "INSERT INTO Staff_Phone_Number (username, phone_number) VALUES (%s, %s)"
+            cursor.execute(phone_ins, (username, i))
+            conn.commit()
         cursor.close()
         return render_template('index.html')
+
+
+@app.route('/staff-main', methods=['GET', 'POST'])
+def staff_main():
+    username = session['username']
+    name = session['name']
+    '''
+    # cursor used to send queries
+    cursor = conn.cursor()
+    # executes query
+    query = ""
+    cursor.execute(query, (username))
+    # stores the results in a variable
+    flights = cursor.fetchall()
+    cursor.close()
+    '''
+    flights = None
+    return render_template('Staff/staff-main.html', name=name, flights=flights)
+
+
+@app.route('/search_flights', methods=['POST'])
+def search_flights():  # Search Flight for index.html
+    # get data from form
+    airline_name = request.form['airline_name']
+    flight_number = request.form['flight_number']
+    departure_date_and_time = request.form['departure_date_and_time']
+    arrival_date_and_time = request.form['arrival_date_and_time']
+    arrival_airport_code = request.form['arrival_airport_code']
+    departure_airport_code = request.form['departure_airport_code']
+
+    # cursor used to send queries
+    cursor = conn.cursor()
+    # executes query
+    query = "SELECT * FROM Flight WHERE airline_name=%s OR flight_number=%s OR departure_date_and_time=%s OR arrival_date_and_time=%s OR arrival_airport_code=%s OR departure_airport_code=%s"
+    cursor.execute(query, (airline_name, flight_number, departure_date_and_time,
+                   arrival_date_and_time, arrival_airport_code, departure_airport_code))
+    # stores the results in a variable
+    flights = cursor.fetchall()
+    # use fetchall() if you are expecting more than 1 data row
+    cursor.close()
+    if len(flights) == 0:
+        # no flights
+        error = 'No flights found for the selected criteria.'
+        return render_template('index.html', error=error)
+
+    # Return result
+    return render_template('index.html', flights=flights)
 
 
 app.secret_key = 'some key that you will never guess'

@@ -13,17 +13,17 @@ CREATE TABLE Airline (
 );
 
 CREATE TABLE Airplane (
-  airline_name VARCHAR(20),
+  airline_name VARCHAR(30),
   identification_number VARCHAR(6),
   number_of_seats INT NOT NULL,
-  manufacturing_company VARCHAR(20) NOT NULL,
+  manufacturing_company VARCHAR(50) NOT NULL,
   manufacturing DATE NOT NULL,
   PRIMARY KEY (identification_number, airline_name),
   FOREIGN KEY (airline_name) REFERENCES Airline(name)
 );
 
 CREATE TABLE Flight (
-  airline_name VARCHAR(20),
+  airline_name VARCHAR(30),
   flight_number VARCHAR(20),
   departure_date_and_time TIMESTAMP,
   arrival_date_and_time TIMESTAMP NOT NULL,
@@ -37,7 +37,7 @@ CREATE TABLE Flight (
 );
 
 CREATE TABLE Fly (
-  airline_name VARCHAR(20),
+  airline_name VARCHAR(30),
   flight_number VARCHAR(20),
   departure_date_and_time TIMESTAMP,
   identification_number VARCHAR(6),
@@ -57,19 +57,19 @@ CREATE TABLE Payment_Information (
 );
 
 CREATE TABLE Customer (
-  email_address VARCHAR(30),
+  email_address VARCHAR(50),
   first_name VARCHAR(20) NOT NULL,
   last_name VARCHAR(20) NOT NULL,
   c_password VARCHAR(255) NOT NULL,
   building_number INT NOT NULL,
-  street_name VARCHAR(20) NOT NULL,
+  street_name VARCHAR(30) NOT NULL,
   apartment_number VARCHAR(10),
   city VARCHAR(20) NOT NULL,
   state VARCHAR(3) NOT NULL,
   zip_code INT NOT NULL,
   passport_number VARCHAR(9) NOT NULL,
   passport_expiration DATE NOT NULL,
-  passport_country VARCHAR(10) NOT NULL,
+  passport_country VARCHAR(60) NOT NULL,
   date_of_birth DATE NOT NULL,
   PRIMARY KEY (email_address)
 );
@@ -82,12 +82,12 @@ CREATE TABLE Customer_Phone_Number (
 );
 
 CREATE TABLE Ticket (
-  ticket_ID INT(11) AUTO_INCREMENT,
+  ticket_ID INT AUTO_INCREMENT,
   first_name VARCHAR(20) NOT NULL,
   last_name VARCHAR(20) NOT NULL,
   date_of_birth DATE NOT NULL,
   calculated_price_of_ticket NUMERIC(10,2) NOT NULL,
-  airline_name VARCHAR(20) NOT NULL,
+  airline_name VARCHAR(30) NOT NULL,
   flight_number VARCHAR(20) NOT NULL,
   departure_date_and_time TIMESTAMP NOT NULL,
   email_address VARCHAR(50) NOT NULL,
@@ -97,30 +97,30 @@ CREATE TABLE Ticket (
 );
 
 CREATE TABLE Evaluation (
-  email_address VARCHAR(20),
-  airline_name VARCHAR(20),
+  email_address VARCHAR(50),
+  airline_name VARCHAR(30),
   flight_number VARCHAR(20),
   departure_date_and_time TIMESTAMP,
   rate INT NOT NULL,
-  comment VARCHAR(200),
+  comment VARCHAR(1000),
   PRIMARY KEY (email_address, airline_name, flight_number, departure_date_and_time),
   FOREIGN KEY (email_address) REFERENCES Customer(email_address),
   FOREIGN KEY (airline_name, flight_number, departure_date_and_time) REFERENCES Flight(airline_name, flight_number, departure_date_and_time)
 );
 
 CREATE TABLE Airline_Staff (
-  username VARCHAR(20),
+  username VARCHAR(50),
   s_password VARCHAR(255) NOT NULL,
   first_name VARCHAR(20) NOT NULL,
   last_name VARCHAR(20) NOT NULL,
   date_of_birth DATE NOT NULL,
-  airline_name VARCHAR(20) NOT NULL,
+  airline_name VARCHAR(30) NOT NULL,
   PRIMARY KEY (username),
   FOREIGN KEY (airline_name) REFERENCES Airline(name)
 );
 
 CREATE TABLE Staff_Email (
-  username VARCHAR(20),
+  username VARCHAR(50),
   email_address VARCHAR(50),
   PRIMARY KEY (username, email_address),
   FOREIGN KEY (username) REFERENCES Airline_Staff(username) ON DELETE CASCADE
@@ -134,7 +134,7 @@ CREATE TABLE Staff_Phone_Number (
 );
 
 CREATE TABLE Purchase (
-  ticket_ID INT(11),
+  ticket_ID INT,
   card_number VARCHAR(20),
   purchase_date_and_time TIMESTAMP NOT NULL,
   PRIMARY KEY (ticket_ID, card_number),
