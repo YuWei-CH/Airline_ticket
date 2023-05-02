@@ -7,7 +7,9 @@
     <title>Ticket Resrvation System</title>
   </head>
   <body>
-    <h1>Thanks, you are successfully submit your rate and comment</h1>
+    {% if text %}
+    <h1>{{text}}</h1>
+    {% endif %}
     <a href="{{ url_for('user_main') }}">Back to main</a>
   </body>
 </html>

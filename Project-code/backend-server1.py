@@ -7,7 +7,7 @@ import hashlib
 
 # Initialize the app from Flask
 app = Flask(__name__)
-'''
+
 # Configure MySQL
 conn = pymysql.connect(host='localhost',
                        port=8889,
@@ -17,7 +17,6 @@ conn = pymysql.connect(host='localhost',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
 '''
-
 # Configure MySQL
 conn = pymysql.connect(host='localhost',
                        user='root',
@@ -25,6 +24,7 @@ conn = pymysql.connect(host='localhost',
                        db='air_ticket_system',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
+'''
 
 # Define a route to hello function
 
@@ -226,7 +226,7 @@ def user_track():
     # cursor used to send queries
     cursor = conn.cursor()
     # executes query
-    query = "SELECT * FROM (SELECT f.airline_name, f.departure_date_and_time, f.arrival_date_and_time, f.arrival_airport_code, f.departure_airport_code, f.flight_number FROM Ticket t JOIN Flight f ON f.flight_number=t.flight_number WHERE email_address= %s) AS derived_table_alias WHERE arrival_date_and_time < NOW();"
+    query = "SELECT DISTINCT * FROM (SELECT f.airline_name, f.departure_date_and_time, f.arrival_date_and_time, f.arrival_airport_code, f.departure_airport_code, f.flight_number FROM Ticket t JOIN Flight f ON f.flight_number=t.flight_number WHERE email_address= %s) AS derived_table_alias WHERE arrival_date_and_time < NOW();"
     cursor.execute(query, (email))
     # stores the results in a variable
     flights = cursor.fetchall()
@@ -460,7 +460,7 @@ def search_and_rate():
     departure_date_and_time = request.form['departure_date_and_time']
     cursor = conn.cursor()
 
-    query = "SELECT * FROM (SELECT f.airline_name, f.departure_date_and_time, f.arrival_date_and_time, f.arrival_airport_code, f.departure_airport_code, f.flight_number FROM Ticket t JOIN Flight f ON f.flight_number=t.flight_number WHERE email_address= %s) AS derived_table_alias WHERE arrival_date_and_time < NOW();"
+    query = "SELECT DISTINCT * FROM (SELECT f.airline_name, f.departure_date_and_time, f.arrival_date_and_time, f.arrival_airport_code, f.departure_airport_code, f.flight_number FROM Ticket t JOIN Flight f ON f.flight_number=t.flight_number WHERE email_address= %s) AS derived_table_alias WHERE arrival_date_and_time < NOW();"
     cursor.execute(query, (email))
     # stores the results in a variable
     flights = cursor.fetchall()
@@ -471,17 +471,29 @@ def search_and_rate():
         # cursor used to send queries
         # executes query
         # print(email)
-        query = "INSERT INTO Evaluation (email_address,airline_name,flight_number,departure_date_and_time,rate,comment) VALUES (%s,%s,%s,%s,%s,%s);"
-        cursor.execute(query, (email, airline_name, flight_number,
-                               departure_date_and_time, rate, comment))
-        # use fetchall() if you are expecting more than 1 data row
-        conn.commit()
+        query = "SELECT DISTINCT * FROM Evaluation WHERE email_address = %s AND airline_name = %s AND flight_number = %s AND departure_date_and_time = %s;"
+        cursor.execute(query, (email, airline_name,
+                       flight_number, departure_date_and_time))
+        result = cursor.fetchone()
+
+        if result is not None:
+            # Update existing record
+            text = "Sorry, you already rate and comment for this flight"
+        else:
+            # Insert new record
+            insert_query = "INSERT INTO Evaluation (email_address,airline_name,flight_number,departure_date_and_time,rate,comment) VALUES (%s,%s,%s,%s,%s,%s);"
+            cursor.execute(insert_query, (email, airline_name,
+                           flight_number, departure_date_and_time, rate, comment))
+            text = "Thanks, you are successfully submit your rate and comment"
+            # commit changes
+            conn.commit()
+        # close cursor and connection
         cursor.close()
-        # Return result
-        return render_template('User/user-rate-result.html')
+        return render_template('User/user-rate-result.html', text=text)
     else:
         cursor.close()
         return render_template('User/user-track.html', flights=flights)
+
 
 # track user spend specifically
 
@@ -492,10 +504,14 @@ def track_specific_spend():
     email = session['email']
     start_date = request.form['start-date']
     end_date = request.form['end-date']
+    query = "SELECT SUM(t.calculated_price_of_ticket) FROM Ticket t JOIN Purchase p ON t.ticket_ID = p.ticket_ID WHERE t.email_address = %s AND p.purchase_date_and_time BETWEEN %s AND %s;"
+    cursor.execute(query, (email, start_date, end_date))
+    total_monthly_spend = cursor.fetchone(
+    )['SUM(t.calculated_price_of_ticket)']
 
     # get monthly spending
-    start_year, start_month, _ = start_date.split('-')
-    end_year, end_month, _ = end_date.split('-')
+    start_year, start_month, start_day = start_date.split('-')
+    end_year, end_month, end_day = end_date.split('-')
     start_month = int(start_month)
     end_month = int(end_month)
     year_diff = int(end_year) - int(start_year)
@@ -507,11 +523,18 @@ def track_specific_spend():
         if month > 12:
             year = str(int(year) + 1)
             month -= 12
-        last_day = calendar.monthrange(int(year), month)[1]
+        if i == 0:
+            start_day = int(start_day)
+        else:
+            start_day = 1
+        if i == month_diff - 1:
+            end_day = int(end_day)
+        else:
+            end_day = calendar.monthrange(int(year), month)[1]
         start_time = "00:00:00"
         end_time = "23:59:59"
-        date_range = (f"{year}-{month:02}-01 {start_time}",
-                      f"{year}-{month:02}-{last_day} {end_time}")
+        date_range = (f"{year}-{month:02}-{start_day} {start_time}",
+                      f"{year}-{month:02}-{end_day} {end_time}")
         query = "SELECT SUM(t.calculated_price_of_ticket) FROM Ticket t JOIN Purchase p ON t.ticket_ID = p.ticket_ID WHERE t.email_address = %s AND p.purchase_date_and_time BETWEEN %s AND %s;"
         cursor.execute(query, (email, date_range[0], date_range[1]))
         monthly_spend = cursor.fetchone()['SUM(t.calculated_price_of_ticket)']
@@ -519,8 +542,10 @@ def track_specific_spend():
             monthly_spend = 0
         month_year = f"{calendar.month_name[month]} {year}"
         specific_monthly_spending[month_year] = monthly_spend
-        session['specific_monthly_spending'] = specific_monthly_spending
+    session['specific_monthly_spending'] = (
+        total_monthly_spend, specific_monthly_spending)
     cursor.close()
+
     # send data back
     return redirect(url_for('track_spending'))
 

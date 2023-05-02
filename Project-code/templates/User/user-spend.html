@@ -47,8 +47,12 @@
 
       <button type="submit">View Spending</button>
     </form>
+    <p>
+      Total amount spent in <strong>selected date</strong>: ${{
+      specific_monthly_spending[0] }}
+    </p>
 
-    {% if specific_monthly_spending %}
+    {% if specific_monthly_spending[1] %}
     <h2>Monthly Spending for Selected Date Range</h2>
     <table>
       <thead>
@@ -58,7 +62,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for month, spend in specific_monthly_spending.items() %}
+        {% for month, spend in specific_monthly_spending[1].items() %}
         <tr>
           <td>{{ month }}</td>
           <td>${{ spend }}</td>
