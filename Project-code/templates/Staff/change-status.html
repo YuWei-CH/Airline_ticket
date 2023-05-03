@@ -35,7 +35,7 @@
       <a id="logout" href="/logout">Log Out</a>
     </div>
 
-    <form action="/changeStatus" method="POST">
+    <form action="/toggleStatus" method="POST">
       <label for="flight-number">Flight Number: </label>
       <input type="text" name="flight-number" id="flight-number" required />
       <br /><br />
@@ -47,15 +47,28 @@
         required
       />
       <br /><br />
+      <label for="identification-number"
+        >Airplane Identification Number:
+      </label>
+      <input
+        type="text"
+        name="identification-number"
+        id="identification-number"
+        required
+      />
+      <br /><br />
       <label for="status">Status: </label>
       <select name="status" id="status" required>
         <option value="" disabled selected hidden>Status</option>
-        <option value="On Time">On Time</option>
-        <option value="Delayed">Delayed</option>
+        <option value="on time">On Time</option>
+        <option value="delay">Delayed</option>
       </select>
       <br /><br />
       <input type="submit" value="Update" />
-      <br /><br />
+      <br />
     </form>
+    {% if error %}
+    <h3>{{error}}</h3>
+    {% endif %}
   </body>
 </html>

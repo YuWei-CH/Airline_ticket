@@ -35,7 +35,7 @@
       <a id="logout" href="/logout">Log Out</a>
     </div>
 
-    <form action="/addAirplane" method="POST">
+    <form action="/insertAirplane" method="POST">
       <label for="identification-number">Identification Number: </label>
       <input
         type="text"
@@ -69,6 +69,10 @@
       />
       <br /><br />
       <input type="submit" value="Add" />
+      <br />
     </form>
+    {% if error %}
+    <h3>{{error}}</h3>
+    {% endif %}
   </body>
 </html>

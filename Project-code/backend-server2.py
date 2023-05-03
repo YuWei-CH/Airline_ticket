@@ -104,10 +104,19 @@ def staffRegisterAuth():
     # stores the results in a variable
     data = cursor.fetchone()
     # use fetchall() if you are expecting more than 1 data row
+
+    # Check if the airline exist
+    query = "SELECT * FROM Airline WHERE name = %s"
+    cursor.execute(query, (airline_name))
+    airline_exist = cursor.fetchone()
+
     error = None
     if (data):
         # If the previous query returns data, then user exists
-        error = "This user already exists"
+        error = "This user already exists!"
+        return render_template('Staff/staff-register.html', error=error)
+    elif (not airline_exist):
+        error = "The airline you are working for does not exist!"
         return render_template('Staff/staff-register.html', error=error)
     else:
         ins = "INSERT INTO Airline_Staff (username, s_password, first_name, last_name, date_of_birth, airline_name) VALUES (%s, %s, %s, %s, %s, %s)"
@@ -230,11 +239,13 @@ def create_new_flight():
 
 @app.route('/insertNewFlight', methods=['GET', 'POST'])
 def insertNewFlight():
+    # verify if the user is actually a airline staff
     verification = session['type']
     if verification != "staff":
         session.clear()
-        action = "creating new flight"
+        action = "create a new flight"
         return render_template('no_permission.html', action=action)
+
     # grabs information from the forms
     flight_number = request.form['flight-number']
     departure_date_and_time = request.form['departure-date-and-time']
@@ -243,20 +254,48 @@ def insertNewFlight():
     departure_airport = request.form['departure-airport']
     arrival_airport = request.form['arrival-airport']
     airline_name = session['airline_name']
+    identification_number = request.form['identification-number']
 
     cursor = conn.cursor()
+
+    # check if the flight already exists
     query = "SELECT * FROM Flight WHERE flight_number = %s AND departure_date_and_time = %s AND airline_name = %s"
     cursor.execute(
         query, (flight_number, departure_date_and_time, airline_name))
-    data = cursor.fetchone()
+    flight_exist = cursor.fetchone()
+
+    # check if the airport exists
+    query = "SELECT * FROM Airport WHERE code = %s"
+    cursor.execute(query, (arrival_airport))
+    arrival_airport_exist = cursor.fetchone()
+    cursor.execute(query, (departure_airport))
+    departure_airport_exist = cursor.fetchone()
+
+    # check if the airplane exists
+    query = "SELECT * FROM Airplane WHERE airline_name = %s AND identification_number = %s"
+    cursor.execute(query, (airline_name, identification_number))
+    airplane_exist = cursor.fetchone()
+
     error = None
-    if (data):
+    if (flight_exist):
         error = "This flight already exists!"
         return render_template('Staff/new-flight.html', error=error)
+    elif (not (arrival_airport_exist and departure_airport_exist)):
+        error = "One or both of the airport doesn't exist!"
+        return render_template('Staff/new-flight.html', error=error)
+    elif (not airplane_exist):
+        error = "The airplane does not exist! "
+        return render_template('Staff/new-flight.html', error=error)
     else:
-        ins = "INSERT INTO Flight (airline_name, flight_number, departure_date_and_time, arrival_date_and_time, base_price_of_ticket, arrival_airport_code, departure_airport_code) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-        cursor.execute(ins, (airline_name, flight_number, departure_date_and_time,
-                             arrival_date_and_time, base_price_of_ticket, arrival_airport, departure_airport))
+        # insert into both Flight and Fly
+        insFlight = "INSERT INTO Flight (airline_name, flight_number, departure_date_and_time, arrival_date_and_time, base_price_of_ticket, arrival_airport_code, departure_airport_code) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        cursor.execute(insFlight, (airline_name, flight_number, departure_date_and_time,
+                                   arrival_date_and_time, base_price_of_ticket, arrival_airport, departure_airport))
+        conn.commit()
+        flight_status = "on time"
+        insFly = "INSERT INTO Fly (airline_name, flight_number, departure_date_and_time, identification_number, flight_status) VALUES (%s, %s, %s, %s, %s)"
+        cursor.execute(insFly, (airline_name, flight_number,
+                       departure_date_and_time, identification_number, flight_status))
         conn.commit()
         cursor.close()
         return redirect(url_for('success'))
@@ -265,6 +304,88 @@ def insertNewFlight():
 @app.route('/success')
 def success():
     return render_template('Staff/success.html')
+
+
+@app.route('/change-status', methods=['GET', 'POST'])
+def change_status():
+    return render_template('Staff/change-status.html')
+
+
+@app.route('/toggleStatus', methods=['GET', 'POST'])
+def toggleStatus():
+    verification = session['type']
+    if verification != "staff":
+        session.clear()
+        action = "change the flight status"
+        return render_template('no_permission.html', action=action)
+
+    # grabs information from the forms
+    flight_number = request.form['flight-number']
+    departure_date_and_time = request.form['departure-date-and-time']
+    airline_name = session['airline_name']
+    flight_status = request.form['status']
+    identification_number = request.form['identification-number']
+
+    cursor = conn.cursor()
+
+    # check if the flight exists
+    query = "SELECT * FROM Fly WHERE flight_number = %s AND departure_date_and_time = %s AND airline_name = %s AND identification_number = %s"
+    cursor.execute(
+        query, (flight_number, departure_date_and_time, airline_name, identification_number))
+    flight_exist = cursor.fetchone()
+
+    error = None
+    if (not flight_exist):
+        error = "This flight does not exist! "
+        return render_template('Staff/change-status.html', error=error)
+    else:
+        # change flight status
+        updateQuery = "UPDATE Fly SET flight_status = %s WHERE airline_name = %s AND flight_number = %s AND departure_date_and_time = %s AND identification_number = %s"
+        cursor.execute(updateQuery, (flight_status, airline_name,
+                                     flight_number, departure_date_and_time, identification_number))
+        conn.commit()
+        cursor.close()
+        return redirect(url_for('success'))
+
+
+@app.route('/add-airplane', methods=['GET', 'POST'])
+def addAirplane():
+    return render_template('Staff/add-airplane.html')
+
+
+@app.route('/insertAirplane', methods=['GET', 'POST'])
+def insertAirplane():
+    verification = session['type']
+    if verification != "staff":
+        session.clear()
+        action = "add new airplane"
+        return render_template('no_permission.html', action=action)
+
+    # grabs information from the forms
+    airline_name = session['airline_name']
+    identification_number = request.form['identification-number']
+    number_of_seats = request.form['number-of-seats']
+    manufacturing_company = request.form['manufacturing-company']
+    manufacture_date = request.form['manufacture-date']
+
+    cursor = conn.cursor()
+
+    # check if the airplane already exists
+    query = "SELECT * FROM Airplane WHERE airline_name = %s AND identification_number = %s"
+    cursor.execute(query, (airline_name, identification_number))
+    airplane_exist = cursor.fetchone()
+
+    error = None
+    if (airplane_exist):
+        error = "This airplane already exists!"
+        return render_template('Staff/add-airplane.html', error=error)
+    else:
+        insAirplane = "INSERT INTO Airplane (airline_name, identification_number, number_of_seats, manufacturing_company, manufacturing) VALUES (%s, %s, %s, %s, %s)"
+        cursor.execute(insAirplane, (airline_name, identification_number,
+                       number_of_seats, manufacturing_company, manufacture_date))
+        conn.commit()
+        cursor.close()
+        return redirect(url_for('success'))
 
 
 @app.route('/search_flights', methods=['POST'])
@@ -296,6 +417,7 @@ def search_flights():  # Search Flight for index.html
     return render_template('index.html', flights=flights)
 
 
+'''
 @app.route('/Staff/view-ratings.html')
 def register():
     return render_template('Staff/view-ratings.html')
@@ -338,7 +460,7 @@ def register():
 
     query = ""
     return render_template('Staff/view-report.html')
-
+'''
 
 app.secret_key = 'some key that you will never guess'
 # Run the app on localhost port 5000
