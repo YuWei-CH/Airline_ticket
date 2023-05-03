@@ -296,6 +296,50 @@ def search_flights():  # Search Flight for index.html
     return render_template('index.html', flights=flights)
 
 
+@app.route('/Staff/view-ratings.html')
+def register():
+    return render_template('Staff/view-ratings.html')
+
+
+@app.route('/viewRatings', methods=['POST'])
+def view_Ratings():
+    # get data from form
+    flight_number = request.form['flight-number']
+    departure_date_and_time = request.form['departure-date-and-time']
+
+    # cursor used to send queries
+    cursor = conn.cursor()
+    # executes query, the flight shoud be past flight
+    query = "SELECT * FROM Evaluation WHERE flight_number=%s AND departure_date_and_time <= NOW()"
+    cursor.execute(query, (flight_number, departure_date_and_time))
+    # stores the results in a variable
+    flights = cursor.fetchall()
+    # use fetchall() if you are expecting more than 1 data row
+    cursor.close()
+    if len(flights) == 0:
+        # no flights
+        error = 'Sorry, this flight has not been rate'
+        return render_template('Staff/view-ratings.html', error=error)
+    # Return result
+    return render_template('Staff/view-ratings.html', flights=flights)
+
+
+@app.route('/Staff/view-report.html')
+def register():
+    # last month amounts
+    query = ""
+    # last year amounts
+
+    # 12 months
+
+    # most frequent
+
+    #
+
+    query = ""
+    return render_template('Staff/view-report.html')
+
+
 app.secret_key = 'some key that you will never guess'
 # Run the app on localhost port 5000
 # debug = True -> you don't have to restart flask

@@ -60,12 +60,21 @@
     </form>
     <h2>Average Rating:</h2>
     <table>
+      {%if error%}
+      <h3>{{error}}</h3>
+      {%end if%} {%if not error%}
       <tr>
         <th>Customer's Email</th>
         <th>Rating</th>
         <th>Comment</th>
       </tr>
-      <tr></tr>
+      <tr>
+        {% for item in flights %}
+        <td>{{ item.email_address }}</td>
+        <td>{{ item.rate }}</td>
+        <td>{{ item.comment }}</td>
+        {% endfor %} {%end if%}
+      </tr>
     </table>
   </body>
 </html>
