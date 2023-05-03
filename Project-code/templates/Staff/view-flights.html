@@ -9,11 +9,16 @@
       table {
         width: 100%;
         border: 1px solid black;
+        text-align: center;
       }
 
       th,
       td {
         border: 1px solid black;
+      }
+
+      tr {
+        height: 40px;
       }
 
       #home,
@@ -41,11 +46,11 @@
   <body>
     <div>
       <h1>View Flight</h1>
-      <a id="home" href="staff-main.html">Home</a>
+      <a id="home" href="/staff-main">Home</a>
       <a id="logout" href="/logout">Log Out</a>
     </div>
 
-    <form action="/viewFlights" method="POST">
+    <form action="{{ url_for('search_airline_flights') }}" method="POST">
       <label for="from-date">From Date</label>
       <input type="date" name="from-date" id="from-date" />
       <br /><br />
@@ -61,6 +66,9 @@
       <input type="submit" value="Search" />
       <br /><br />
     </form>
+    {% if error %}
+    <h3>{{error}}</h3>
+    {% endif %} {% if not error %}
     <table>
       <tr>
         <th>Flight Number</th>
@@ -69,8 +77,29 @@
         <th>Departure Airport</th>
         <th>Arrival Airport</th>
         <th>Base Price of Ticket</th>
+        <th>View Customer</th>
       </tr>
-      <tr></tr>
+      {% for flight in flights %}
+      <tr>
+        <td>{{ flight.flight_number }}</td>
+        <td>{{ flight.departure_date_and_time }}</td>
+        <td>{{ flight.arrival_date_and_time }}</td>
+        <td>{{ flight.arrival_airport_code }}</td>
+        <td>{{ flight.departure_airport_code }}</td>
+        <td>${{ flight.base_price_of_ticket}}</td>
+        <td>
+          <form action="{{ url_for('view_customers') }}" method="POST">
+            <input
+              type="hidden"
+              name="flight_number"
+              value="{{ flight.flight_number }}"
+            />
+            <input type="submit" value="View Customer" />
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
     </table>
+    {% endif %}
   </body>
 </html>

@@ -6,22 +6,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Change Flight Status</title>
     <style>
+      #home,
       #logout {
         position: fixed;
         top: 25px;
-        right: 25px;
         color: black;
         text-decoration: none;
       }
 
+      #home:hover,
       #logout:hover {
         text-decoration: underline;
+      }
+
+      #home {
+        right: 100px;
+      }
+
+      #logout {
+        right: 25px;
       }
     </style>
   </head>
   <body>
     <div>
       <h1>Change Status of Flights</h1>
+      <a id="home" href="/staff-main">Home</a>
       <a id="logout" href="/logout">Log Out</a>
     </div>
 

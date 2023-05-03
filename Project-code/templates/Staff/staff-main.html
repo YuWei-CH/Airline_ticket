@@ -33,11 +33,16 @@
       table {
         width: 100%;
         border: 1px solid black;
+        text-align: center;
       }
 
       th,
       td {
         border: 1px solid black;
+      }
+
+      tr {
+        height: 40px;
       }
     </style>
   </head>
@@ -49,9 +54,8 @@
 
     <nav>
       <ul>
-        <a class="actions" href="view-flights.html">View Flight</a>
-        <a class="actions" href="view-customers.html">View Customers</a>
-        <a class="actions" href="new-flight.html">Create New Flight</a>
+        <a class="actions" href="/view-flights">View Flight</a>
+        <a class="actions" href="/create-new-flight">Create New Flight</a>
         <a class="actions" href="change-status.html">Change Flight Status</a>
         <a class="actions" href="add-airplane.html">Add Airplane</a>
         <a class="actions" href="add-airport.html">Add Airport</a>
@@ -64,6 +68,9 @@
     </nav>
 
     <h2>Future Flight for Next 30 Days</h2>
+    {% if error %}
+    <h3>{{error}}</h3>
+    {% endif %} {% if not error %}
     <table>
       <tr>
         <th>Flight Number</th>
@@ -72,8 +79,29 @@
         <th>Departure Airport</th>
         <th>Arrival Airport</th>
         <th>Base Price of Ticket</th>
+        <th>View Customer</th>
       </tr>
-      <tr></tr>
+      {% for flight in flights %}
+      <tr>
+        <td>{{ flight.flight_number }}</td>
+        <td>{{ flight.departure_date_and_time }}</td>
+        <td>{{ flight.arrival_date_and_time }}</td>
+        <td>{{ flight.arrival_airport_code }}</td>
+        <td>{{ flight.departure_airport_code }}</td>
+        <td>${{ flight.base_price_of_ticket}}</td>
+        <td>
+          <form action="{{ url_for('view_customers') }}" method="POST">
+            <input
+              type="hidden"
+              name="flight_number"
+              value="{{ flight.flight_number }}"
+            />
+            <input type="submit" value="View Customer" />
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
     </table>
+    {% endif %}
   </body>
 </html>

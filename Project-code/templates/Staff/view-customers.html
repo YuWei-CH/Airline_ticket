@@ -9,11 +9,16 @@
       table {
         width: 100%;
         border: 1px solid black;
+        text-align: center;
       }
 
       th,
       td {
         border: 1px solid black;
+      }
+
+      tr {
+        height: 30px;
       }
 
       #home,
@@ -41,25 +46,12 @@
   <body>
     <div>
       <h1>View Customers</h1>
-      <a id="home" href="staff-main.html">Home</a>
+      <a id="home" href="/staff-main">Home</a>
       <a id="logout" href="/logout">Log Out</a>
     </div>
-
-    <form action="/viewCustomers" method="POST">
-      <label for="flight-number">Flight Number: </label>
-      <input type="text" name="flight-number" id="flight-number" required />
-      <br /><br />
-      <label for="departure-date-and-time">Departure Date and Time: </label>
-      <input
-        type="datetime-local"
-        name="departure-date-and-time"
-        id="departure-date-and-time"
-        required
-      />
-      <br /><br />
-      <input type="submit" value="Search" />
-      <br /><br />
-    </form>
+    {% if error %}
+    <h2>{{error}}</h2>
+    {% endif %} {% if not error %}
     <table>
       <tr>
         <th>Email Address</th>
@@ -69,7 +61,17 @@
         <th>Passport Number</th>
         <th>Phone Number</th>
       </tr>
-      <tr></tr>
+      {% for customer in customers %}
+      <tr>
+        <td>{{ customer.email_address }}</td>
+        <td>{{ customer.first_name }}</td>
+        <td>{{ customer.last_name }}</td>
+        <td>{{ customer.date_of_birth }}</td>
+        <td>{{ customer.passport_number }}</td>
+        <td>{{ customer.phone_number }}</td>
+      </tr>
+      {% endfor %}
     </table>
+    {% endif %}
   </body>
 </html>

@@ -6,26 +6,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Create New Flight</title>
     <style>
+      #home,
       #logout {
         position: fixed;
         top: 25px;
-        right: 25px;
         color: black;
         text-decoration: none;
       }
 
+      #home:hover,
       #logout:hover {
         text-decoration: underline;
+      }
+
+      #home {
+        right: 100px;
+      }
+
+      #logout {
+        right: 25px;
       }
     </style>
   </head>
   <body>
     <div>
       <h1>Create New Flight</h1>
+      <a id="home" href="/staff-main">Home</a>
       <a id="logout" href="/logout">Log Out</a>
     </div>
 
-    <form action="/newFlight" method="POST">
+    <form action="/insertNewFlight" method="POST">
       <label for="flight-number">Flight Number: </label>
       <input type="text" name="flight-number" id="flight-number" required />
       <br /><br />
@@ -49,13 +59,31 @@
       <input type="number" name="base-price" id="base-price" required />
       <br /><br />
       <label for="departure-airport">Departure Airport Code: </label>
-      <input type="text" name="departure-airport" id="departure-airport" />
+      <input
+        type="text"
+        name="departure-airport"
+        id="departure-airport"
+        required
+      />
       <br /><br />
       <label for="arrival-airport">Arrival Airport Code: </label>
-      <input type="text" name="arrival-airport" id="arrival-airport" />
+      <input type="text" name="arrival-airport" id="arrival-airport" required />
+      <br /><br />
+      <label for="identification-number"
+        >Airplane Identification Number:
+      </label>
+      <input
+        type="text"
+        name="identification-number"
+        id="identification-number"
+        required
+      />
       <br /><br />
       <input type="submit" value="Create" />
       <br /><br />
     </form>
+    {% if error %}
+    <h3>{{error}}</h3>
+    {% endif %}
   </body>
 </html>
