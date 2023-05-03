@@ -2,6 +2,7 @@
 from flask import Flask, render_template, request, session, url_for, redirect
 import pymysql.cursors
 import hashlib
+import datetime
 
 # Initialize the app from Flask
 app = Flask(__name__)
@@ -417,7 +418,6 @@ def search_flights():  # Search Flight for index.html
     return render_template('index.html', flights=flights)
 
 
-'''
 @app.route('/Staff/view-ratings.html')
 def register():
     return render_template('Staff/view-ratings.html')
@@ -447,20 +447,74 @@ def view_Ratings():
 
 
 @app.route('/Staff/view-report.html')
-def register():
-    # last month amounts
-    query = ""
-    # last year amounts
+def reports():
+    cursor = conn.cursor()
+    airline_name = session['airline_name']
+    # get total_amount if it exist, else set to 0
+    total_amount = request.args.get(
+        'total_amount') if request.args.get('total_amount') else 0
+    # Get the total number of tickets sold last month
+    today = datetime.date.today()
+    first_day_of_month = today.replace(day=1)
+    last_day_of_previous_month = first_day_of_month - \
+        datetime.timedelta(days=1)
+    query = "SELECT COUNT(*) as num FROM Ticket JOIN Purchase ON Ticket.ticket_ID = Purchase.ticket_ID WHERE airline_name = %s AND Purchase.purchase_date_and_time BETWEEN %s AND %s"
+    cursor.execute(query, (airline_name,
+                   last_day_of_previous_month.replace(day=1), last_day_of_previous_month))
+    last_month_tickets_sold = cursor.fetchone()['num']
 
-    # 12 months
+    # Get the total number of tickets sold last year
+    query = "SELECT COUNT(*) as num FROM Ticket JOIN Purchase ON Ticket.ticket_ID = Purchase.ticket_ID WHERE airline_name = %s AND YEAR(Purchase.purchase_date_and_time) = YEAR(CURRENT_DATE - INTERVAL 1 YEAR)"
+    cursor.execute(query, (airline_name))
+    last_year_tickets_sold = cursor.fetchone()['num']
 
-    # most frequent
+    monthly_tickets_sold = [{'month': month, 'num': 0}
+                            for month in range(1, 13)]
+    # Get the number of tickets sold each month, retuen by a dict: month, num
+    query = "SELECT MONTH(Purchase.purchase_date_and_time) as month, COUNT(*) as num FROM Ticket JOIN Purchase ON Ticket.ticket_ID = Purchase.ticket_ID WHERE airline_name = %s GROUP BY MONTH(Purchase.purchase_date_and_time)"
+    cursor.execute(query, (airline_name))
+    result = cursor.fetchall()
 
-    #
+    for i in monthly_tickets_sold:
+        for j in result:
+            if j['month'] == i['month']:
+                i['num'] = j['num']
+                break
 
-    query = ""
-    return render_template('Staff/view-report.html')
-'''
+    # Get the most frequent customer in the last year,
+    query = "SELECT email_address, COUNT(*) as num FROM Ticket JOIN Purchase ON Ticket.ticket_ID = Purchase.ticket_ID WHERE airline_name = %s AND Purchase.purchase_date_and_time BETWEEN DATE_SUB(NOW(), INTERVAL 1 YEAR) AND NOW() GROUP BY email_address ORDER BY ticket_count DESC LIMIT 1"
+    cursor.execute(query, (airline_name))
+    most_frequent_customer = cursor.fetchone()
+
+    # Get the total revenue last month
+    query = "SELECT SUM(calculated_price_of_ticket) FROM Ticket JOIN Purchase ON Ticket.ticket_ID = Purchase.ticket_ID WHERE airline_name = %s AND Purchase.purchase_date_and_time BETWEEN %s AND %s"
+    cursor.execute(query, (airline_name, last_day_of_previous_month.replace(
+        day=1), last_day_of_previous_month))
+    last_month_revenue = cursor.fetchone()['SUM(calculated_price_of_ticket)']
+
+    # Get the total revenue last year
+    query = "SELECT SUM(calculated_price_of_ticket) FROM Ticket JOIN Purchase ON Ticket.ticket_ID = Purchase.ticket_ID WHERE airline_name = %s AND YEAR(Purchase.purchase_date_and_time) = YEAR(CURRENT_DATE - INTERVAL 1 YEAR)"
+    cursor.execute(query)
+    last_year_revenue = cursor.fetchone()['SUM(calculated_price_of_ticket)']
+
+    cursor.close()
+
+    return render_template('Staff/view-report.html', total_amount=total_amount, last_month_tickets_sold=last_month_tickets_sold, last_year_tickets_sold=last_year_tickets_sold, monthly_tickets_sold=monthly_tickets_sold, most_frequent_customer=most_frequent_customer, last_month_revenue=last_month_revenue, last_year_revenue=last_year_revenue)
+
+
+@app.route('/ticketReport', methods=['POST'])
+def ticket_report():
+    cursor = conn.cursor()
+    airline_name = session['airline_name']
+    # Get the total amount of ticket sales between the specified dates
+    start_date = request.form['start-date']
+    end_date = request.form['end-date']
+    query = "SELECT SUM(calculated_price_of_ticket) AS total FROM Ticket JOIN Purchase ON Ticket.ticket_ID = Purchase.ticket_ID WHERE airline_name=%s AND Purchase.purchase_date_and_time BETWEEN %s AND %s"
+    cursor.execute(query, (airline_name, start_date, end_date))
+    result = cursor.fetchone()
+    total_amount = result['total'] if result['total'] else 0
+    return redirect(url_for('reports', total_amount=total_amount))
+
 
 app.secret_key = 'some key that you will never guess'
 # Run the app on localhost port 5000

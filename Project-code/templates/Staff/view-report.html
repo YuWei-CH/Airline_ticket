@@ -55,30 +55,33 @@
     </form>
     <h2>Total Amounts of Ticket Sold From {date} to {date}:</h2>
 
-    <h2>Total Amounts of Ticket Sold Last Month:</h2>
-    <h2>Total Amounts of Ticket Sold Last Year:</h2>
+    <h2>
+      Total Amounts of Ticket Sold Last Month: {{ last_month_tickets_sold }}
+    </h2>
+    <h2>
+      Total Amounts of Ticket Sold Last Year: {{ last_year_tickets_sold }}
+    </h2>
     <h2>Month Wise Tickets Sold:</h2>
     <table>
       <tr>
-        <th>January</th>
-        <th>Feburary</th>
-        <th>March</th>
-        <th>April</th>
-        <th>May</th>
-        <th>June</th>
-        <th>July</th>
-        <th>August</th>
-        <th>September</th>
-        <th>October</th>
-        <th>November</th>
-        <th>December</th>
+        <th>Month</th>
+        <th>Tickets Sold</th>
       </tr>
-      <tr></tr>
+      {% for monthly_sale in monthly_tickets_sold %}
+      <tr>
+        <td>{{ monthly_sale.month }}</td>
+        <td>{{ monthly_sale.num }}</td>
+      </tr>
+      {% endfor %}
     </table>
     <br /><br />
-    <h2>Most Frequent Customer Within Last Year:</h2>
+    <h2>
+      Most Frequent Customer Within Last Year:
+      {{most_frequent_customer[email_address]}}, who buy
+      {{most_frequent_customer[num]}} tickets
+    </h2>
     <br />
-    <h2>Total Revenue (Last Month):</h2>
-    <h2>Total Revenue (Last Year):</h2>
+    <h2>Total Revenue (Last Month): {{last_month_revenue}}</h2>
+    <h2>Total Revenue (Last Year): {{last_year_revenue}}</h2>
   </body>
 </html>
