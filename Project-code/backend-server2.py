@@ -176,7 +176,6 @@ def view_flights():
 
 @app.route('/search_airline_flights', methods=['POST'])
 def search_airline_flights():
-    username = session['username']
     # get data from form
     from_date = request.form['from-date']
     to_date = request.form['to-date']
@@ -386,6 +385,59 @@ def insertAirplane():
                        number_of_seats, manufacturing_company, manufacture_date))
         conn.commit()
         cursor.close()
+        return redirect(url_for('displayAirplane'))
+
+
+@app.route('/displayAirplane')
+def displayAirplane():
+    airline_name = session['airline_name']
+    cursor = conn.cursor()
+    # executes query
+    search_query = "SELECT * FROM Airplane WHERE airline_name = %s"
+    cursor.execute(search_query, (airline_name))
+    # stores the results in a variable
+    airplanes = cursor.fetchall()
+    cursor.close()
+    return render_template('Staff/display-all-airplane.html', airline_name=airline_name, airplanes=airplanes)
+
+
+@app.route('/add-airport', methods=['GET', 'POST'])
+def addAirport():
+    return render_template('Staff/add-airport.html')
+
+
+@app.route('/insertAirport', methods=['GET', 'POST'])
+def insertAirport():
+    verification = session['type']
+    if verification != "staff":
+        session.clear()
+        action = "add new airport"
+        return render_template('no_permission.html', action=action)
+
+    # grabs information from the forms
+    airport_code = request.form['code']
+    airport_name = request.form['name']
+    airport_city = request.form['city']
+    airport_country = request.form['country']
+    airport_type = request.form['type']
+
+    cursor = conn.cursor()
+
+    # check if the airport already exists
+    query = "SELECT * FROM Airport WHERE code = %s"
+    cursor.execute(query, (airport_code))
+    airport_exist = cursor.fetchone()
+
+    error = None
+    if (airport_exist):
+        error = "This airport already exists!"
+        return render_template('Staff/add-airport.html', error=error)
+    else:
+        insAirport = "INSERT INTO Airport (code, name, city, country, airport_type) VALUES (%s, %s, %s, %s, %s)"
+        cursor.execute(insAirport, (airport_code, airport_name,
+                       airport_city, airport_country, airport_type))
+        conn.commit()
+        cursor.close()
         return redirect(url_for('success'))
 
 
@@ -418,36 +470,60 @@ def search_flights():  # Search Flight for index.html
     return render_template('index.html', flights=flights)
 
 
-@app.route('/Staff/view-ratings.html')
-def register():
-    return render_template('Staff/view-ratings.html')
+@app.route('/view-ratings', methods=['GET', 'POST'])
+def viewRatings():
+    error = " "
+    return render_template('Staff/view-ratings.html', error=error)
 
 
-@app.route('/viewRatings', methods=['POST'])
-def view_Ratings():
+@app.route('/displayRatings', methods=['POST'])
+def displayRatings():
     # get data from form
+    airline_name = session['airline_name']
     flight_number = request.form['flight-number']
     departure_date_and_time = request.form['departure-date-and-time']
+    datetime_obj = datetime.datetime.fromisoformat(departure_date_and_time)
 
-    # cursor used to send queries
     cursor = conn.cursor()
+    error = None
+
+    # check if the flight already exists
+    query = "SELECT * FROM Flight WHERE flight_number = %s AND departure_date_and_time = %s AND airline_name = %s"
+    cursor.execute(
+        query, (flight_number, departure_date_and_time, airline_name))
+    flight_exist = cursor.fetchone()
+
+    if (not flight_exist):
+        error = "This flight does not exists!"
+        return render_template('Staff/view-ratings.html', error=error)
+    if datetime_obj >= datetime.datetime.today():
+        error = "This is a future flight, it does not have ratings yet. "
+        return render_template('Staff/view-ratings.html', error=error)
+
     # executes query, the flight shoud be past flight
-    query = "SELECT * FROM Evaluation WHERE flight_number=%s AND departure_date_and_time <= NOW()"
-    cursor.execute(query, (flight_number, departure_date_and_time))
+    query = "SELECT Evaluation.email_address, Evaluation.rate, Evaluation.comment FROM Evaluation WHERE airline_name = %s AND flight_number = %s AND departure_date_and_time = %s"
+    cursor.execute(
+        query, (airline_name, flight_number, departure_date_and_time))
     # stores the results in a variable
-    flights = cursor.fetchall()
-    # use fetchall() if you are expecting more than 1 data row
+    customers = cursor.fetchall()
+
+    # calculate average rating
+    averageQuery = "SELECT AVG(rate) as avg_rating FROM Evaluation WHERE airline_name = %s AND flight_number = %s AND departure_date_and_time = %s"
+    cursor.execute(averageQuery, (airline_name,
+                   flight_number, departure_date_and_time))
+    average_rating = cursor.fetchone()
+
     cursor.close()
-    if len(flights) == 0:
-        # no flights
-        error = 'Sorry, this flight has not been rate'
+    if len(customers) == 0:
+        # no ratings
+        error = "This flight does not have any ratings. "
         return render_template('Staff/view-ratings.html', error=error)
     # Return result
-    return render_template('Staff/view-ratings.html', flights=flights)
+    return render_template('Staff/view-ratings.html', customers=customers, average_rating=average_rating, error=error)
 
 
-@app.route('/Staff/view-report.html')
-def reports():
+@app.route('/view-report', methods=['GET', 'POST'])
+def view_report():
     cursor = conn.cursor()
     airline_name = session['airline_name']
     # get total_amount if it exist, else set to 0
@@ -482,7 +558,7 @@ def reports():
                 break
 
     # Get the most frequent customer in the last year,
-    query = "SELECT email_address, COUNT(*) as num FROM Ticket JOIN Purchase ON Ticket.ticket_ID = Purchase.ticket_ID WHERE airline_name = %s AND Purchase.purchase_date_and_time BETWEEN DATE_SUB(NOW(), INTERVAL 1 YEAR) AND NOW() GROUP BY email_address ORDER BY ticket_count DESC LIMIT 1"
+    query = "SELECT email_address, COUNT(*) as num FROM Ticket JOIN Purchase ON Ticket.ticket_ID = Purchase.ticket_ID WHERE airline_name = %s AND Purchase.purchase_date_and_time BETWEEN DATE_SUB(NOW(), INTERVAL 2 YEAR) AND DATE_SUB(NOW(),INTERVAL 1 YEAR) GROUP BY email_address ORDER BY num DESC LIMIT 1"
     cursor.execute(query, (airline_name))
     most_frequent_customer = cursor.fetchone()
 
@@ -491,12 +567,15 @@ def reports():
     cursor.execute(query, (airline_name, last_day_of_previous_month.replace(
         day=1), last_day_of_previous_month))
     last_month_revenue = cursor.fetchone()['SUM(calculated_price_of_ticket)']
+    if not last_month_revenue:
+        last_month_revenue = 0
 
     # Get the total revenue last year
     query = "SELECT SUM(calculated_price_of_ticket) FROM Ticket JOIN Purchase ON Ticket.ticket_ID = Purchase.ticket_ID WHERE airline_name = %s AND YEAR(Purchase.purchase_date_and_time) = YEAR(CURRENT_DATE - INTERVAL 1 YEAR)"
-    cursor.execute(query)
+    cursor.execute(query, (airline_name))
     last_year_revenue = cursor.fetchone()['SUM(calculated_price_of_ticket)']
-
+    if not last_year_revenue:
+        last_year_revenue = 0
     cursor.close()
 
     return render_template('Staff/view-report.html', total_amount=total_amount, last_month_tickets_sold=last_month_tickets_sold, last_year_tickets_sold=last_year_tickets_sold, monthly_tickets_sold=monthly_tickets_sold, most_frequent_customer=most_frequent_customer, last_month_revenue=last_month_revenue, last_year_revenue=last_year_revenue)
@@ -509,11 +588,11 @@ def ticket_report():
     # Get the total amount of ticket sales between the specified dates
     start_date = request.form['start-date']
     end_date = request.form['end-date']
-    query = "SELECT SUM(calculated_price_of_ticket) AS total FROM Ticket JOIN Purchase ON Ticket.ticket_ID = Purchase.ticket_ID WHERE airline_name=%s AND Purchase.purchase_date_and_time BETWEEN %s AND %s"
+    query = "SELECT COUNT(*) AS total FROM Ticket JOIN Purchase ON Ticket.ticket_ID = Purchase.ticket_ID WHERE airline_name=%s AND Purchase.purchase_date_and_time BETWEEN %s AND %s"
     cursor.execute(query, (airline_name, start_date, end_date))
     result = cursor.fetchone()
     total_amount = result['total'] if result['total'] else 0
-    return redirect(url_for('reports', total_amount=total_amount))
+    return redirect(url_for('view_report', total_amount=total_amount))
 
 
 app.secret_key = 'some key that you will never guess'

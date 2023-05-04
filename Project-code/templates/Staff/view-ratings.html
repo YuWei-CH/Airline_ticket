@@ -36,6 +36,10 @@
       td {
         border: 1px solid black;
       }
+
+      tr {
+        height: 40px;
+      }
     </style>
   </head>
   <body>
@@ -44,7 +48,7 @@
       <a id="home" href="/staff-main">Home</a>
       <a id="logout" href="/logout">Log Out</a>
     </div>
-    <form action="/viewRatings" method="POST">
+    <form action="/displayRatings" method="POST">
       <label for="flight-number">Flight Number: </label>
       <input type="text" name="flight-number" id="flight-number" required />
       <br /><br />
@@ -58,23 +62,24 @@
       <br /><br />
       <input type="submit" value="View" />
     </form>
-    <h2>Average Rating:</h2>
+    {% if error %}
+    <h3>{{error}}</h3>
+    {% endif %} {% if not error %}
+    <h2>Average Rating: {{ average_rating.avg_rating }}</h2>
     <table>
-      {%if error%}
-      <h3>{{error}}</h3>
-      {%end if%} {%if not error%}
       <tr>
         <th>Customer's Email</th>
         <th>Rating</th>
         <th>Comment</th>
       </tr>
+      {% for customer in customers %}
       <tr>
-        {% for item in flights %}
-        <td>{{ item.email_address }}</td>
-        <td>{{ item.rate }}</td>
-        <td>{{ item.comment }}</td>
-        {% endfor %} {%end if%}
+        <td>{{ customer.email_address }}</td>
+        <td>{{ customer.rate }}</td>
+        <td>{{ customer.comment }}</td>
       </tr>
+      {% endfor %}
     </table>
+    {% endif %}
   </body>
 </html>

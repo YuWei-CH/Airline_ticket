@@ -28,13 +28,18 @@
       }
 
       table {
-        width: 100%;
+        width: 50%;
         border: 1px solid black;
+        text-align: center;
       }
 
       th,
       td {
         border: 1px solid black;
+      }
+
+      tr {
+        height: 30px;
       }
     </style>
   </head>
@@ -53,7 +58,7 @@
       <input type="date" name="end-date" id="end-date" />
       <input type="submit" value="Search" />
     </form>
-    <h2>Total Amounts of Ticket Sold From {date} to {date}:</h2>
+    <h2>Total Amounts of Ticket Sold From Date Selected: {{ total_amount }}</h2>
 
     <h2>
       Total Amounts of Ticket Sold Last Month: {{ last_month_tickets_sold }}
@@ -74,12 +79,16 @@
       </tr>
       {% endfor %}
     </table>
-    <br /><br />
+    <br />
+    {% if not most_frequent_customer %}
+    <h2>There are no customer last year!</h2>
+    {% endif %} {% if most_frequent_customer %}
     <h2>
       Most Frequent Customer Within Last Year:
       {{most_frequent_customer[email_address]}}, who buy
       {{most_frequent_customer[num]}} tickets
     </h2>
+    {% endif %}
     <br />
     <h2>Total Revenue (Last Month): {{last_month_revenue}}</h2>
     <h2>Total Revenue (Last Year): {{last_year_revenue}}</h2>

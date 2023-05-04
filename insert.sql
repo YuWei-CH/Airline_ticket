@@ -1,7 +1,7 @@
 INSERT INTO Airline VALUES ('Jet Blue');
 
-INSERT INTO Airport VALUES ('JFK', 'John F. Kennedy International Airport', 'New York City', 'USA','both');
-INSERT INTO Airport VALUES ('PVG','Shanghai Pudong International Airport', 'Shanghai', 'China','both');
+INSERT INTO Airport VALUES ('JFK', 'John F. Kennedy International Airport', 'New York City', 'USA','Both');
+INSERT INTO Airport VALUES ('PVG','Shanghai Pudong International Airport', 'Shanghai', 'China','Both');
 
 INSERT INTO Customer VALUES ('ys4680@nyu.edu', 'Yuwei', 'Sun', 'mypassword', 370, 'Jay St', 'Apt# 1109', 'Brooklyn', 'NY', 11201, 'CH1234567', DATE('2028-04-06'), 'China', DATE('2002-12-26'));
 INSERT INTO Customer VALUES ('yw5490@nyu.edu', 'Yirong', 'Wang', 'mypassword', 370, 'Jay St', 'Apt# 2210', 'Brooklyn', 'NY', 11201, 'CH9876543', DATE('2029-04-05'), 'China', DATE('2003-03-25'));

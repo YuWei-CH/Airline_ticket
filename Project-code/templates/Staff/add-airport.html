@@ -35,7 +35,7 @@
       <a id="logout" href="/logout">Log Out</a>
     </div>
 
-    <form action="/addAirport" method="POST">
+    <form action="/insertAirport" method="POST">
       <label for="code">Airport Code: </label>
       <input type="text" name="code" id="code" required />
       <br /><br />
@@ -57,7 +57,10 @@
       </select>
       <br /><br />
       <input type="submit" value="Add" />
-      <br /><br />
+      <br />
     </form>
+    {% if error %}
+    <h3>{{error}}</h3>
+    {% endif %}
   </body>
 </html>

@@ -9,11 +9,16 @@
       table {
         width: 100%;
         border: 1px solid black;
+        text-align: center;
       }
 
       th,
       td {
         border: 1px solid black;
+      }
+
+      tr {
+        height: 30px;
       }
 
       #home,
@@ -53,7 +58,14 @@
         <th>Manufacturing Company</th>
         <th>Manufacture Date</th>
       </tr>
-      <tr></tr>
+      {% for airplane in airplanes %}
+      <tr>
+        <td>{{ airplane.identification_number }}</td>
+        <td>{{ airplane.number_of_seats }}</td>
+        <td>{{ airplane.manufacturing_company }}</td>
+        <td>{{ airplane.manufacturing }}</td>
+      </tr>
+      {% endfor %}
     </table>
   </body>
 </html>
