@@ -4,24 +4,21 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ticket Resrvation System</title>
-    <link rel="stylesheet" href="../CSS/user-main.css" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='CSS/style.css') }}"
+    />
+    <title>Airline Ticket System</title>
   </head>
   <body>
     <!--Header-->
-    <header>
-      <!-- Welcome, {name}-->
+    <div>
       <h1>Welcome, {{username.first_name}}</h1>
-      <!-- navigator bar -->
-      <nav>
-        <ul>
-          <li><a href="../User/user-flight-booking.html">Flight Booking</a></li>
-          <li><a href="/user-track">Rate My Ticket</a></li>
-          <li><a href="/user-spend">Track Spend</a></li>
-          <li><a href="/logout">Log Out</a></li>
-        </ul>
-      </nav>
-    </header>
+      <li><a href="../User/user-flight-booking.html">Flight Booking</a></li>
+      <li><a href="/user-track">Rate My Ticket</a></li>
+      <li><a href="/user-spend">Track Spend</a></li>
+      <li><a href="/logout">Log Out</a></li>
+    </div>
     <main>
       <!--View Future Flight-->
       <div>

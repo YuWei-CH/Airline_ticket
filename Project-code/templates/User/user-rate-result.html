@@ -4,12 +4,20 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ticket Resrvation System</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='CSS/style.css') }}"
+    />
+    <title>Airline Ticket System</title>
   </head>
   <body>
+    <div>
+      <h1>Rate result:</h1>
+      <a id="home" href="/user-main">Home</a>
+      <a id="logout" href="/logout">Log Out</a>
+    </div>
     {% if text %}
     <h1>{{text}}</h1>
     {% endif %}
-    <a href="{{ url_for('user_main') }}">Back to main</a>
   </body>
 </html>

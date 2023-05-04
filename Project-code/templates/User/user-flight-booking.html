@@ -4,21 +4,18 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ticket Resrvation System</title>
-    <link rel="stylesheet" href="../CSS/user-flight-booking.css" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='CSS/style.css') }}"
+    />
+    <title>Airline Ticket System</title>
   </head>
   <body>
-    <h1>Flight Booking</h1>
-    <!-- navigate bar -->
-    <nav>
-      <ul>
-        <li><a href="/user-main">Back to Main</a></li>
-        <li><a href="/logout">Log Out</a></li>
-      </ul>
-    </nav>
-
-    <!-- search bar -->
-    <!---->
+    <div>
+      <h1>Flight Booking</h1>
+      <a id="home" href="/user-main">Home</a>
+      <a id="logout" href="/logout">Log Out</a>
+    </div>
     <div class="search-bar">
       <form action="{{ url_for('search_and_book_flight') }}" method="POST">
         <label for="airline_name">Airline Name:</label>

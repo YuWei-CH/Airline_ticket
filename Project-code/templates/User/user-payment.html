@@ -1,10 +1,21 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Payment Information</title>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='CSS/style.css') }}"
+    />
+    <title>Airline Ticket System</title>
   </head>
   <body>
-    <h1>Payment Information</h1>
+    <div>
+      <h1>Payment Information</h1>
+      <a id="home" href="/user-main">Home</a>
+      <a id="logout" href="/logout">Log Out</a>
+    </div>
     <form
       action="{{ url_for('purchase_flight', flight_number=flight_number) }}"
       method="POST"

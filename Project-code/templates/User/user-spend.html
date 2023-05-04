@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Track My Spending</title>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='CSS/style.css') }}"
+    />
+    <title>Airline Ticket System</title>
   </head>
-  <header>
-    <h1>Track My Spending</h1>
-    <!-- navigator bar -->
-    <nav>
-      <ul>
-        <li><a href="/user-main">Back to Main</a></li>
-        <li><a href="/logout">Log Out</a></li>
-      </ul>
-    </nav>
-  </header>
   <body>
+    <div>
+      <h1>Track My Spending</h1>
+      <a id="home" href="/user-main">Home</a>
+      <a id="logout" href="/logout">Log Out</a>
+    </div>
     <h2>Total Amount Spent in Past Year:</h2>
     <p>
       Total amount spent in <strong>past year</strong>: ${{ total_spending }}
@@ -48,11 +50,11 @@
       <button type="submit">View Spending</button>
     </form>
     <p>
-      Total amount spent in <strong>selected date</strong>: ${{
-      specific_monthly_spending[0].items() }}
+      {% if specific_monthly_spending %} Total amount spent in
+      <strong>selected date</strong>: ${{ specific_monthly_spending[0] }} {%
+      endif %} {% if specific_monthly_spending[1] %}
     </p>
 
-    {% if specific_monthly_spending[1] %}
     <h2>Monthly Spending for Selected Date Range</h2>
     <table>
       <thead>

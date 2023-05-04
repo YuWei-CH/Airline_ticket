@@ -78,10 +78,29 @@ def search_flights():
 
     # cursor used to send queries
     cursor = conn.cursor()
-    # executes query
-    query = "SELECT * FROM Flight WHERE airline_name=%s OR flight_number=%s OR departure_date_and_time=%s OR arrival_date_and_time=%s OR arrival_airport_code=%s OR departure_airport_code=%s"
-    cursor.execute(query, (airline_name, flight_number, departure_date_and_time,
-                   arrival_date_and_time, arrival_airport_code, departure_airport_code))
+    # build the query string based on user input
+    query = "SELECT * FROM Flight WHERE 1=1"
+    params = []
+    if airline_name:
+        query += " AND airline_name=%s"
+        params.append(airline_name)
+    if flight_number:
+        query += " AND flight_number=%s"
+        params.append(flight_number)
+    if departure_date_and_time:
+        query += " AND departure_date_and_time=%s"
+        params.append(departure_date_and_time)
+    if arrival_date_and_time:
+        query += " AND arrival_date_and_time=%s"
+        params.append(arrival_date_and_time)
+    if arrival_airport_code:
+        query += " AND arrival_airport_code=%s"
+        params.append(arrival_airport_code)
+    if departure_airport_code:
+        query += " AND departure_airport_code=%s"
+        params.append(departure_airport_code)
+    cursor.execute(query, tuple(params))
+
     # stores the results in a variable
     flights = cursor.fetchall()
     # use fetchall() if you are expecting more than 1 data row
@@ -93,7 +112,6 @@ def search_flights():
 
     # Return result
     return render_template('index.html', flights=flights)
-
 
 # Authenticates the login
 
@@ -126,6 +144,7 @@ def loginAuth():
         # session is a built in
         session['username'] = name
         session['email'] = email
+        session['type'] = "customer"
         return redirect(url_for('user_main'))
     else:
         # returns an error message to the html page
@@ -287,12 +306,11 @@ def track_spending():
             monthly_spend = 0  # if no spending, set it to 0
         month_year = date_range[0].strftime('%B %Y')
         monthly_spending[month_year] = monthly_spend
-        print(date_range)
     if 'specific_monthly_spending' in session:
         specific_monthly_spending = session['specific_monthly_spending']
     else:
         specific_monthly_spending = None
-
+    print(specific_monthly_spending)
     cursor.close()
     # send data back
     return render_template("User/user-spend.html",
@@ -320,15 +338,47 @@ def search_user_flights():
 
     # cursor used to send queries
     cursor = conn.cursor()
-    # executes query
-    # executes query
-    query = "SELECT * FROM (SELECT f.airline_name, f.departure_date_and_time, f.arrival_date_and_time, f.arrival_airport_code, f.departure_airport_code, f.flight_number FROM Ticket t JOIN Flight f ON f.flight_number = t.flight_number WHERE email_address = %s) AS derived_table_alias WHERE derived_table_alias.flight_number = %s OR derived_table_alias.departure_date_and_time = %s OR derived_table_alias.arrival_date_and_time = %s OR derived_table_alias.arrival_airport_code = %s OR derived_table_alias.departure_airport_code = %s"
-    cursor.execute(query, (email, flight_number, departure_date_and_time,
-                   arrival_date_and_time, arrival_airport_code, departure_airport_code))
+
+    # list of conditions to include in the query
+    conditions = []
+    values = [email]
+
+    # check if flight number is provided
+    if flight_number:
+        conditions.append("f.flight_number = %s")
+        values.append(flight_number)
+
+    # check if departure date and time is provided
+    if departure_date_and_time:
+        conditions.append("f.departure_date_and_time = %s")
+        values.append(departure_date_and_time)
+
+    # check if arrival date and time is provided
+    if arrival_date_and_time:
+        conditions.append("f.arrival_date_and_time = %s")
+        values.append(arrival_date_and_time)
+
+    # check if arrival airport code is provided
+    if arrival_airport_code:
+        conditions.append("f.arrival_airport_code = %s")
+        values.append(arrival_airport_code)
+
+    # check if departure airport code is provided
+    if departure_airport_code:
+        conditions.append("f.departure_airport_code = %s")
+        values.append(departure_airport_code)
+
+    # combine conditions into SQL query
+    query = "SELECT * FROM (SELECT f.airline_name, f.departure_date_and_time, f.arrival_date_and_time, f.arrival_airport_code, f.departure_airport_code, f.flight_number FROM Ticket t JOIN Flight f ON f.flight_number = t.flight_number WHERE email_address = %s) AS derived_table_alias"
+    if conditions:
+        query += " WHERE " + " AND ".join(conditions)
+
+    # execute query
+    cursor.execute(query, values)
+
     # stores the results in a variable
     flights = cursor.fetchall()
-    # use fetchall() if you are expecting more than 1 data row
-    cursor.close()
+
     if len(flights) == 0:
         # no flights
         error = 'No flights found for the selected criteria.'
@@ -343,6 +393,7 @@ def search_user_flights():
 @app.route('/search_and_book_flight', methods=['GET', 'POST'])
 def search_and_book_flight():
     # get data from form
+    cursor = conn.cursor()
     airline_name = request.form['airline_name']
     flight_number = request.form['flight_number']
     departure_date_and_time = request.form['departure_date_and_time']
@@ -350,13 +401,39 @@ def search_and_book_flight():
     arrival_airport_code = request.form['arrival_airport_code']
     departure_airport_code = request.form['departure_airport_code']
 
-    # cursor used to send queries
-    cursor = conn.cursor()
-    # executes query
-    query = "SELECT * FROM Flight WHERE (departure_date_and_time>NOW() AND arrival_date_and_time>NOW()) AND (airline_name=%s OR flight_number=%s OR departure_date_and_time=%s  OR arrival_date_and_time=%s OR arrival_airport_code=%s OR departure_airport_code=%s)"
-    cursor.execute(query, (airline_name, flight_number, departure_date_and_time,
-                   arrival_date_and_time, arrival_airport_code, departure_airport_code))
-    # stores the results in a variable
+    query = "SELECT * FROM Flight WHERE (departure_date_and_time>NOW() AND arrival_date_and_time>NOW())"
+
+    conditions = []
+    params = []
+
+    if airline_name:
+        conditions.append("airline_name = %s")
+        params.append(airline_name)
+
+    if flight_number:
+        conditions.append("flight_number = %s")
+        params.append(flight_number)
+
+    if departure_date_and_time:
+        conditions.append("departure_date_and_time = %s")
+        params.append(departure_date_and_time)
+
+    if arrival_date_and_time:
+        conditions.append("arrival_date_and_time = %s")
+        params.append(arrival_date_and_time)
+
+    if arrival_airport_code:
+        conditions.append("arrival_airport_code = %s")
+        params.append(arrival_airport_code)
+
+    if departure_airport_code:
+        conditions.append("departure_airport_code = %s")
+        params.append(departure_airport_code)
+
+    if conditions:
+        query += " AND " + " AND ".join(conditions)
+
+    cursor.execute(query, tuple(params))
     flights = cursor.fetchall()
     # use fetchall() if you are expecting more than 1 data row
     cursor.close()
@@ -365,7 +442,7 @@ def search_and_book_flight():
         error = 'No flights found for the selected criteria.'
         return render_template('User/user-flight-booking.html', error=error)
 
-    # Return result
+        # Return result
     return render_template('User/user-flight-booking.html', flights=flights)
 # Purchase flight
 
@@ -502,8 +579,10 @@ def search_and_rate():
 def track_specific_spend():
     cursor = conn.cursor()
     email = session['email']
-    start_date = request.form['start-date'] + "00:00:00"
-    end_date = request.form['end-date'] + "23:59:59"
+    start_date = datetime.datetime.strptime(
+        request.form['start-date'], '%Y-%m-%d').strftime('%Y-%m-%d')
+    end_date = datetime.datetime.strptime(
+        request.form['end-date'], '%Y-%m-%d').strftime('%Y-%m-%d 23:59:59')
     query = "SELECT SUM(t.calculated_price_of_ticket) FROM Ticket t JOIN Purchase p ON t.ticket_ID = p.ticket_ID WHERE t.email_address = %s AND p.purchase_date_and_time BETWEEN %s AND %s;"
     cursor.execute(query, (email, start_date, end_date))
     total_monthly_spend = cursor.fetchone(
@@ -537,7 +616,8 @@ def track_specific_spend():
                       f"{year}-{month:02}-{end_day} {end_time}")
         query = "SELECT SUM(t.calculated_price_of_ticket) FROM Ticket t JOIN Purchase p ON t.ticket_ID = p.ticket_ID WHERE t.email_address = %s AND p.purchase_date_and_time BETWEEN %s AND %s;"
         cursor.execute(query, (email, date_range[0], date_range[1]))
-        monthly_spend = cursor.fetchone()['SUM(t.calculated_price_of_ticket)']
+        monthly_spend = cursor.fetchone(
+        )['SUM(t.calculated_price_of_ticket)']
         if monthly_spend is None:
             monthly_spend = 0
         month_year = f"{calendar.month_name[month]} {year}"
