@@ -38,7 +38,31 @@ In *Others* which contain part1 and part2 work.
 #### detailed structure
 index.html: Home page, allowing customers and employees to register for login. It also allows to view future flights.   
 no_permission.html: If the user performs some unauthorized operation, he will be returned to this page.  
-Staff folder:
-- add-airplane.html to enable staff add plane.  
-- add-airpoet.html to enable staff add airport.   
-- change-status.html to allow staff change the status of a plane.   
+
+Static:
+- style.css: contain all style formant.    
+
+Staff folder:    
+- add-airplane.html: enable staff add plane.    
+- add-airpoet.html: enable staff add airport.     
+- change-status.html: allow staff change the status of a plane.    
+- display-all-airplane.html: show all current airplane for this airline.   
+- new-flight.html: add new flight.   
+- staff-login.html: enable staff login system.        
+- staff-register.html: register staff.   
+- success.html: show a success result for some insertion and query.  
+- view-customer-flight.html: view flight data for a specific customer.  
+- view-customers.html: after click, staff can view this customer.  
+- view-flights.html: view public flight.  
+- view-ratings.html: view rating and comments for all or specific flights in this airline.  
+     
+User folder:    
+- user-flight-booking.html: allow user search and book flight through some specific conditions.   
+- user-login.html: allow user to login.   
+- user-main.html: show personal flight information for this user.   
+- user-payment.html: record customer's payment information.   
+- user-purchase-result.html: display successful or error when costumer purchase a flight.    
+- user-rate-result.html: display successful or error when costumer rate a previous flight.    
+- user-register.html: customer register.    
+- user-spend.html: show this customer spending for past year, past 6 months and a specific range of date.   
+- user-track.html: show all flights for this customer. Also, customer can rate and write comment for a previous flight.  
