@@ -29,11 +29,11 @@ general, this will be a simple air ticket reservation system.
 You should be able to see a main page. And your can start.   
 
 ### Structure of project
-In *Project-code*
+- In *Project-code*
 1. static folder: all the static resources file, such as style.css.  
 2. templates folder: all .html template file. It has 2 folderes: Staff, User and a index.html.  
-3. backend-server.py which can be be execute.    
-In *Others* which contain part1 and part2 work.
+3. backend-server.py which can be be execute.   
+- In *Others* which contain part1 and part2 work
 
 #### detailed structure
 index.html: Home page, allowing customers and employees to register for login. It also allows to view future flights.   
