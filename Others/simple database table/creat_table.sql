@@ -52,7 +52,7 @@ CREATE TABLE Payment_Information (
   card_number VARCHAR(20),
   card_type VARCHAR(8) NOT NULL,
   name_on_card VARCHAR(20) NOT NULL,
-  expiration_date DATE NOT NULL,
+  expiration_date VARCHAR(10) NOT NULL,
   PRIMARY KEY (card_number)
 );
 

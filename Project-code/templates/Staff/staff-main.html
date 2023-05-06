@@ -56,8 +56,8 @@
         <td>{{ flight.flight_number }}</td>
         <td>{{ flight.departure_date_and_time }}</td>
         <td>{{ flight.arrival_date_and_time }}</td>
-        <td>{{ flight.arrival_airport_code }}</td>
         <td>{{ flight.departure_airport_code }}</td>
+        <td>{{ flight.arrival_airport_code }}</td>
         <td>${{ flight.base_price_of_ticket}}</td>
         <td>
           <form action="{{ url_for('view_customers') }}" method="POST">

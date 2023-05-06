@@ -4,10 +4,13 @@ import pymysql.cursors
 import datetime
 import calendar
 import hashlib
+import decimal
+
 
 # Initialize the app from Flask
 app = Flask(__name__)
 
+'''
 # Configure MySQL
 conn = pymysql.connect(host='localhost',
                        port=8889,
@@ -24,7 +27,7 @@ conn = pymysql.connect(host='localhost',
                        db='air_ticket_system',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
-'''
+
 
 # Define a route to hello function
 
@@ -211,7 +214,7 @@ def user_main():
     # cursor used to send queries
     cursor = conn.cursor()
     # executes query
-    query = "SELECT * FROM (SELECT f.airline_name, f.departure_date_and_time, f.arrival_date_and_time, f.arrival_airport_code, f.departure_airport_code, f.flight_number FROM Ticket t JOIN Flight f ON f.flight_number=t.flight_number WHERE email_address= %s) AS derived_table_alias WHERE (derived_table_alias.departure_date_and_time > NOW()  AND derived_table_alias.arrival_date_and_time > NOW());"
+    query = "SELECT * FROM (SELECT t.calculated_price_of_ticket, f.airline_name, f.departure_date_and_time, f.arrival_date_and_time, f.arrival_airport_code, f.departure_airport_code, f.flight_number FROM Ticket t JOIN Flight f ON f.flight_number=t.flight_number WHERE email_address= %s) AS derived_table_alias WHERE (derived_table_alias.departure_date_and_time > NOW()  AND derived_table_alias.arrival_date_and_time > NOW());"
     cursor.execute(query, (email))
     # stores the results in a variable
     flights = cursor.fetchall()
@@ -345,27 +348,27 @@ def search_user_flights():
 
     # check if flight number is provided
     if flight_number:
-        conditions.append("f.flight_number = %s")
+        conditions.append("flight_number = %s")
         values.append(flight_number)
 
     # check if departure date and time is provided
     if departure_date_and_time:
-        conditions.append("f.departure_date_and_time = %s")
+        conditions.append("departure_date_and_time = %s")
         values.append(departure_date_and_time)
 
     # check if arrival date and time is provided
     if arrival_date_and_time:
-        conditions.append("f.arrival_date_and_time = %s")
+        conditions.append("arrival_date_and_time = %s")
         values.append(arrival_date_and_time)
 
     # check if arrival airport code is provided
     if arrival_airport_code:
-        conditions.append("f.arrival_airport_code = %s")
+        conditions.append("arrival_airport_code = %s")
         values.append(arrival_airport_code)
 
     # check if departure airport code is provided
     if departure_airport_code:
-        conditions.append("f.departure_airport_code = %s")
+        conditions.append("departure_airport_code = %s")
         values.append(departure_airport_code)
 
     # combine conditions into SQL query
@@ -373,6 +376,7 @@ def search_user_flights():
     if conditions:
         query += " WHERE " + " AND ".join(conditions)
 
+    values = tuple(values)
     # execute query
     cursor.execute(query, values)
 
@@ -501,8 +505,9 @@ def purchase_flight(flight_number):
     cursor.execute(query, (flight_number))
     result = cursor.fetchone()
     base_price = result['base_price_of_ticket']
-    if purchase_ratio > 0.8:
-        calculated_price_of_ticket = base_price*1.2
+    if purchase_ratio >= 0.8:
+        calculated_price_of_ticket = decimal.Decimal(
+            base_price) * decimal.Decimal('1.25')
     else:
         calculated_price_of_ticket = base_price
 
@@ -582,7 +587,7 @@ def track_specific_spend():
     start_date = datetime.datetime.strptime(
         request.form['start-date'], '%Y-%m-%d').strftime('%Y-%m-%d')
     end_date = datetime.datetime.strptime(
-        request.form['end-date'], '%Y-%m-%d').strftime('%Y-%m-%d 23:59:59')
+        request.form['end-date'], '%Y-%m-%d').strftime('%Y-%m-%d')
     query = "SELECT SUM(t.calculated_price_of_ticket) FROM Ticket t JOIN Purchase p ON t.ticket_ID = p.ticket_ID WHERE t.email_address = %s AND p.purchase_date_and_time BETWEEN %s AND %s;"
     cursor.execute(query, (email, start_date, end_date))
     total_monthly_spend = cursor.fetchone(
