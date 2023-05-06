@@ -68,6 +68,7 @@
               <th>Price</th>
               <th>Arrival Airport</th>
               <th>Departure Airport</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -81,10 +82,28 @@
               <td>{{ flight.calculated_price_of_ticket }}</td>
               <td>{{ flight.arrival_airport_code }}</td>
               <td>{{ flight.departure_airport_code }}</td>
+              <td>
+                <form action="/cancel" method="post">
+                  <input
+                    type="hidden"
+                    name="flight_number"
+                    value="{{ flight.flight_number }}"
+                  />
+                  <input
+                    type="hidden"
+                    name="departure_date_and_time"
+                    value="{{ flight.departure_date_and_time }}"
+                  />
+                  <button type="submit" class="cancel-button">Cancel</button>
+                </form>
+              </td>
             </tr>
             {% endfor %}
           </tbody>
         </table>
+        {% if error %}
+        <div class="error-message">{{ error }}</div>
+        {% endif %}
       </div>
 
       <!--Track Spending-->

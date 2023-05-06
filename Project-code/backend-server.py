@@ -10,7 +10,7 @@ import decimal
 # Initialize the app from Flask
 app = Flask(__name__)
 
-'''
+
 # Configure MySQL
 conn = pymysql.connect(host='localhost',
                        port=8889,
@@ -27,7 +27,7 @@ conn = pymysql.connect(host='localhost',
                        db='air_ticket_system',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
-
+'''
 
 # Define a route to hello function
 
@@ -208,7 +208,8 @@ def userregisterAuth():
 
 
 @app.route('/user-main', methods=['GET', 'POST'])
-def user_main():
+def user_main(error=None):
+
     username = session['username']
     email = session['email']
     # cursor used to send queries
@@ -219,7 +220,7 @@ def user_main():
     # stores the results in a variable
     flights = cursor.fetchall()
     cursor.close()
-    return render_template('User/user-main.html', username=username, flights=flights)
+    return render_template('User/user-main.html', username=username, flights=flights, error=error)
 
 
 @app.route('/purchase-form/<flight_number>', methods=['GET', 'POST'])
@@ -633,6 +634,33 @@ def track_specific_spend():
 
     # send data back
     return redirect(url_for('track_spending'))
+
+
+@app.route('/cancel', methods=['POST'])
+def cancel():
+    flight_number = request.form['flight_number']
+    departure_date_and_time = request.form['departure_date_and_time']
+    cursor = conn.cursor()
+    email = session['email']
+
+    # how long
+
+    now = datetime.datetime.now()
+    departure_time_str = departure_date_and_time
+    departure_time = datetime.datetime.strptime(
+        departure_time_str, "%Y-%m-%d %H:%M:%S")
+    time_difference = departure_time - now
+
+    error = None
+    # if > 24 h
+    if time_difference > datetime.timedelta(hours=24):
+        # Delete
+        query = "DELETE FROM Ticket WHERE email_address = %s AND flight_number = %s AND departure_date_and_time = %s;"
+        cursor.execute(query, (email, flight_number, departure_date_and_time))
+    else:
+        error = "Sorry, you can't delete it. Less than 24 hours left."
+    conn.commit()
+    return redirect(url_for('user_main', error=error))  # back
 
 
 """
